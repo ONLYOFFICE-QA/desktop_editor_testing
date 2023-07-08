@@ -5,7 +5,6 @@ from os.path import join, getsize, basename, isdir, expanduser, isfile
 import requests
 from rich import print
 
-import config
 from frameworks.StaticData import StaticData
 from frameworks.decorators import singleton
 from frameworks.host_control import FileUtils
@@ -55,7 +54,15 @@ class Telegram:
             )
 
     def send_media_group(self, document_paths: list, caption: str = None, media_type: str = 'document') -> None:
+        """
+        :param document_paths:
+        :param caption:
+        :param media_type: types: 'photo', 'video', 'audio', 'document', 'voice', 'animation'
+        :return:
+        """
         if self._access:
+            if not document_paths:
+                return self.send_message(caption if caption else 'No files to send.', out_msg=True)
             if caption and len(caption)  > 200:
                 document_paths.append(self._make_massage_doc(caption, 'caption.txt'))
             files, media = {}, []

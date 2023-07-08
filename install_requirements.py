@@ -7,17 +7,20 @@ requirements_file = 'requirements.txt'
 poetry_requirements = 'pyproject.toml'
 exceptions = ['python']
 
+Python36 = {
+    "opencv-python": "4.3.0.38",
+    "rich": "12.6.0",
+	"mss": "7.0.1"
+}
+
 def write(text, mode='w'):
     with open(requirements_file, mode) as f:
         f.write(text)
 
 def old_system_package_version(package):
-    if package.lower() == 'opencv-python':
-        return '==4.3.0.38'
-    elif package.lower() == 'rich':
-        return '==12.6.0'
-    elif package.lower() == 'mss':
-        return '==7.0.1'
+    for pkg, version in Python36.items():
+        if package.lower() == pkg.lower():
+            return version
     return ''
 
 def create_requirements():
@@ -28,8 +31,7 @@ def create_requirements():
                     version = old_system_package_version(package)
                 else:
                     version = re.sub(r'[*^]', '', version)
-                    version = f"=={version}" if version else ''
-                write(f"{package}{version}\n", 'a')
+                write(f"{package}{('==' + version) if version else ''}\n", 'a')
 
 def upgrade_pip():
     sb.call('python -m pip install --upgrade pip', shell=True)

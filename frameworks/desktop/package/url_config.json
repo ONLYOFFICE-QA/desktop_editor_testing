@@ -1,0 +1,24 @@
+{
+  "title": "ONLYOFFICE",
+  "host": "https://s3.eu-west-1.amazonaws.com/repo-doc-onlyoffice-com/desktop",
+  "cef107_system": [],
+  "os_family": {
+    "debian": ["debian", "ubuntu", "linuxmint", "pop"],
+    "rhel": ["centos", "redos", "altlinux", "fedora"],
+    "suse": ["opensuse"]
+  },
+  "package_name": {
+    "debian": {
+      "package_cef107": "onlyoffice-desktopeditors_[version]~cef107_amd64.deb",
+      "package": "onlyoffice-desktopeditors_[version]_amd64.deb"
+    },
+    "rhel": {
+      "package_cef107": "onlyoffice-desktopeditors-[version]~cef107.el7.x86_64.rpm",
+      "package": "onlyoffice-desktopeditors-[version].el7.x86_64.rpm"
+    },
+      "suse": {
+      "package_cef107": "onlyoffice-desktopeditors-[version]~cef107.suse12.x86_64.rpm",
+      "package": "onlyoffice-desktopeditors-[version].suse12.x86_64.rpm"
+    }
+  }
+}
