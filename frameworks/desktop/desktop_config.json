@@ -1,0 +1,5 @@
+{
+  "linux_run_command": "onlyoffice-desktopeditors",
+  "mac_run_command": "/Applications/ONLYOFFICE.app/Contents/MacOS/ONLYOFFICE",
+  "windows_run_command": ""
+}

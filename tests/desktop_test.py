@@ -1,41 +1,48 @@
 # -*- coding: utf-8 -*-
 import re
-from frameworks.desktop import Package, DesktopEditor, DesktopData, OnlyOfficePortal
-
 import time
-from frameworks.StaticData import StaticData
-
 from os.path import join, basename
-from frameworks.host_control import FileUtils, HostInfo
-from frameworks.image_handler import Image
+from subprocess import Popen
+
 from rich import print
 from rich.console import Console
-
 from pyvirtualdisplay import Display
 
-from frameworks.telegram import Telegram
+from frameworks.desktop import DesktopEditor, DesktopData
+from frameworks.StaticData import StaticData
+from frameworks.host_control import FileUtils, HostInfo
+from frameworks.image_handler import Image
 from tests.tools.desktop_report import DesktopReport
-
 console = Console()
 
+class TestException(Exception): ...
+
 class DesktopTest:
-    def __init__(self, version: str, custom_config: str = None, display_on: bool = True, telegram: bool = False):
+    def __init__(
+            self,
+            version: str,
+            custom_config: str = None,
+            display_on: bool = True,
+            telegram: bool = False,
+            license_file_path: str = None
+    ):
+        self.config = FileUtils.read_json(custom_config) if custom_config else StaticData.config
         self.telegram_report = telegram
         self.version = version
         self.display_on = display_on
-        self.portal_config = join(StaticData.project_dir, 'portal_config.json')
-        self.package = self._package(version, custom_config)
         self._create_display()
-        self.report = DesktopReport(StaticData.reports_dir, self.version)
+        self.report = DesktopReport(self._report_path())
         self.host_name = re.sub(r"[\s/]", "", HostInfo().name(pretty=True))
-        self.desktop = DesktopEditor(debug_mode=True)
         self.img_dir = StaticData.img_template
         self.bad_files = StaticData.bad_files_dir
         self.good_files = StaticData.good_files_dir
+        self.desktop = self._create_desktop(custom_config, license_file_path)
 
     def run(self):
-        self.package.get()
+        self._install_package()
         self.check_installed()
+        self.check_correct_version()
+        self.desktop.set_license()
         self.wait_until_open(self.desktop.open(), '[DesktopEditors]: start page loaded')
         self.check_open_files()
         self._write_results(f'Passed')
@@ -44,78 +51,88 @@ class DesktopTest:
 
     def check_open_files(self):
         for file in FileUtils.get_paths(self.good_files):
+            if basename(file) in self.config.get('exception_files') if self.config.get('exception_files') else []:
+                print(f"[green]|INFO| File `{basename(file)}` skipped to open.")
+                continue
             print(f"[green]|INFO| Test opening file: {basename(file)}")
             self.desktop.open(file)
-            time.sleep(20) # TODO
+            time.sleep(25) # TODO
             self.check_error_on_screen()
             Image.make_screenshot(f"{join(self.report.dir, f'{self.version}_{self.host_name}_{basename(file)}.png')}")
 
     def check_error_on_screen(self):
-        for img in FileUtils.get_paths(join(self.img_dir, 'errors')):
-            if Image.is_image_present(img):
+        for error_img in FileUtils.get_paths(join(self.img_dir, 'errors')):
+            if Image.is_present(error_img):
                 Image.make_screenshot(f"{join(self.report.dir, f'{self.version}_{self.host_name}_error_screen.png')}")
-                self._write_results('ERROR_ON_SCREEN')
-                raise print(f"[red]|ERROR| An error has been detected.")
+                self._write_results('ERROR')
+                raise TestException(f"[red]|ERROR| An error has been detected.")
 
-    def wait_until_open(self, process, wait_msg, timeout=30):
+    def wait_until_open(self, process: Popen, wait_msg: str, timeout: int = 30):
         start_time = time.time()
         with console.status('') as status:
             while time.time() - start_time < timeout:
                 status.update(f'[green]|INFO| Wait until the editor opens')
                 output = process.stdout.readline().decode().strip()
-                errors = process.stderr.readline().decode().strip()
-                console.print(errors) if errors else ...
                 if output:
-                    console.print(f"[cyan]|INFO|{output}")
+                    console.print(f"[cyan]|INFO| {output}")
                     if wait_msg in output:
+                        print(f"[green]|INFO| Opened.")
                         self.check_error_on_screen()
                         break
             else:
                 self._write_results('NOT_OPENED')
-                raise console.print("[red]|ERROR| Can't open editor ")
+                raise TestException("[red]|ERROR| Can't open desktop editor")
             Image.make_screenshot(f"{join(self.report.dir, f'{self.version}_{self.host_name}_open_editor.png')}")
 
     def check_installed(self):
-        installed_version = self.package.get_version()
+        installed_version = self.desktop.version()
         if self.version != installed_version:
             self._write_results('NOT_INSTALLED')
-            raise print(
-                f"[bold red]|ERROR| OnlyOffice Desktop not installed. "
+            raise TestException(
+                f"[bold red]|ERROR| Desktop not installed. "
                 f"Current version: {installed_version}"
             )
 
-    def _write_results(self, results):
-        self.report.write(HostInfo().name(pretty=True), self.version, self.package.name, results)
-        if self.telegram_report:
-            self._send_report_to_telegram(results)
-
-    def _send_report_to_telegram(self, results: str):
-        pkg_name = re.sub(r"[\s/_]", "", self.package.name)
-        Telegram().send_media_group(
-            document_paths=self._get_report_files(),
-            caption=f'Os: `{HostInfo().name(pretty=True)}`\n'
-                    f'Version: `{self.version}`\n'
-                    f'Package: `{pkg_name}`\n'
-                    f'Result: `{results if results == "Passed" else "Error"}`'
+    def _write_results(self, exit_code: str):
+        self.report.write(
+            os=HostInfo().name(pretty=True),
+            version=self.version,
+            package_name=self.desktop.package.name,
+            exit_code=exit_code,
+            tg_msg=self.telegram_report
         )
 
-    def _get_report_files(self):
-        return sorted(FileUtils.get_paths(self.report.dir), key=lambda x: x.endswith('.csv'))
+    def check_correct_version(self):
+        version =  self.desktop.version()
+        if len([i for i in version.split('.') if i]) != 4:
+            self._write_results('INCORRECT_VERSION')
+            raise TestException(f"[red]|ERROR| The version is not correct: {version}")
 
-    @staticmethod
-    def _package(version: str, custom_config: str) -> Package:
-        return Package(
-            OnlyOfficePortal(version, custom_config),
+    def _install_package(self):
+        if self.version == self.desktop.version():
+            print(f'[green]|INFO| Desktop version: {self.version} already installed[/]')
+            return
+        self.desktop.package.get()
+
+    def _create_display(self, visible: bool = False, size: tuple = (1920, 1080)):
+        if self.display_on:
+            self.display = Display(visible=visible, size=size)
+            self.display.start()
+        else:
+            print("[red]|INFO| Test running without virtual display")
+
+    def _create_desktop(self, custom_config: str, license_file_path: str):
+        return DesktopEditor(
             DesktopData(
+                version=self.version,
                 tmp_dir=StaticData.tmp_dir,
-                version=version,
+                debug_mode=True,
+                custom_config_path=custom_config,
+                lic_file=license_file_path if license_file_path else StaticData.lic_file_path,
                 cache_dir=StaticData.cache_dir
             )
         )
 
-    def _create_display(self):
-        if self.display_on:
-            self.display = Display(visible=0, size=(1920, 1080))
-            self.display.start()
-        else:
-            print("[red]|INFO| Test running without virtual display")
+    def _report_path(self):
+        title = self.config.get('title')
+        return join(StaticData.reports_dir, title, self.version, f"{self.version}_{title}_report.csv")

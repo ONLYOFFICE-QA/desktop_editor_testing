@@ -1,2 +1,4 @@
 /reports/
 /tmp/
+/lic_file/*
+/tests/assets/test_lic.lickey

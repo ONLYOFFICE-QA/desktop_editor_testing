@@ -18,11 +18,11 @@ class VersionHandler:
         self.__version = value
 
     @property
-    def major_version(self) -> str:
+    def major(self) -> str:
         return sub(r'(\d+).(\d+).(\d+).(\d+)', r'\1.\2', self.version)
 
     @property
-    def minor_version(self) -> str:
+    def minor(self) -> str:
         return sub(r'(\d+).(\d+).(\d+).(\d+)', r'\3', self.version)
 
     @property
@@ -31,4 +31,4 @@ class VersionHandler:
 
     @property
     def without_build(self) -> str:
-        return f"{self.major_version}.{self.minor_version}"
+        return f"{self.major}.{self.minor}"

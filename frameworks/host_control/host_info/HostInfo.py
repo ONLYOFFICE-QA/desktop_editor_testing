@@ -13,7 +13,9 @@ class HostInfo:
         self.__arch = machine().lower()
 
     def name(self, pretty: bool = False) -> "str | None":
-        return self.os if self.os == 'windows' else Unix().pretty_name if pretty else Unix().id
+        if self.os == 'windows':
+            return self.os
+        return Unix().pretty_name if pretty else Unix().id
 
     @property
     def version(self) -> "str | None":
@@ -29,11 +31,11 @@ class HostInfo:
 
     @os.setter
     def os(self, value):
-            if value == 'linux':
-                self.__os = 'linux'
-            elif value == 'darwin':
-                self.__os = 'mac'
-            elif value == 'windows':
-                self.__os = 'windows'
-            else:
-                print(f"[bold red]|WARNING| Error defining os: {value}")
+        if value == 'linux':
+            self.__os = 'linux'
+        elif value == 'darwin':
+            self.__os = 'mac'
+        elif value == 'windows':
+            self.__os = 'windows'
+        else:
+            print(f"[bold red]|WARNING| Error defining os: {value}")
