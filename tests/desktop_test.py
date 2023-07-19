@@ -37,6 +37,7 @@ class DesktopTest:
         self.bad_files = StaticData.bad_files_dir
         self.good_files = StaticData.good_files_dir
         self.desktop = self._create_desktop(custom_config, license_file_path)
+        FileUtils.create_dir(self.report.dir, stdout=False)
 
     def run(self):
         self._install_package()
@@ -93,6 +94,12 @@ class DesktopTest:
                 f"Current version: {installed_version}"
             )
 
+    def check_correct_version(self):
+        version =  self.desktop.version()
+        if len([i for i in version.split('.') if i]) != 4:
+            self._write_results('INCORRECT_VERSION')
+            raise TestException(f"[red]|ERROR| The version is not correct: {version}")
+
     def _write_results(self, exit_code: str):
         self.report.write(
             os=HostInfo().name(pretty=True),
@@ -101,12 +108,6 @@ class DesktopTest:
             exit_code=exit_code,
             tg_msg=self.telegram_report
         )
-
-    def check_correct_version(self):
-        version =  self.desktop.version()
-        if len([i for i in version.split('.') if i]) != 4:
-            self._write_results('INCORRECT_VERSION')
-            raise TestException(f"[red]|ERROR| The version is not correct: {version}")
 
     def _install_package(self):
         if self.version == self.desktop.version():
