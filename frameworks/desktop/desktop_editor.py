@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
 import re
+import time
 from os.path import join, dirname, isfile, basename, realpath
 from subprocess import Popen, PIPE
 from frameworks.host_control import HostInfo, FileUtils
 from rich import print
-
+from rich.console import Console
 from .package import Package
 from .data import Data
 
+console = Console()
+class DesktopException(Exception): ...
 
 class DesktopEditor:
     def __init__(self, data: Data):
@@ -30,6 +33,25 @@ class DesktopEditor:
             stderr=PIPE,
             shell=True
         )
+
+    @staticmethod
+    def wait_until_open(stdout_process: Popen, wait_msg: str = '[DesktopEditors]: start page loaded', timeout: int = 30):
+        start_time = time.time()
+        with console.status('green]|INFO| Wait until desktop editor opens') as status:
+            while (time.time() - start_time) < timeout:
+                status.update(
+                    f'[green]|INFO| Waiting for {wait_msg}: {timeout-(time.time() - start_time):.02f} seconds.'
+                )
+                output = stdout_process.stdout.readline().decode().strip()
+                if output:
+                    console.print(f"[cyan]|INFO| {output}")
+                    if wait_msg in output:
+                        break
+            else:
+                raise DesktopException(
+                    f"[red]|ERROR| The waiting time {timeout} seconds for the editor to open has expired."
+                )
+
 
     def version(self) -> "str | None":
         version = re.findall(

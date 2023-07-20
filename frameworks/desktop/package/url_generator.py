@@ -3,8 +3,8 @@ from os.path import isfile, join, dirname, realpath
 from frameworks.host_control import HostInfo, FileUtils
 from frameworks.desktop.handlers.VersionHandler import VersionHandler
 from ..data import Data
-from ..desktop_exceptions import UrlException
 
+class UrlException(Exception): ...
 
 class UrlGenerator:
     def __init__(self, data: Data):
