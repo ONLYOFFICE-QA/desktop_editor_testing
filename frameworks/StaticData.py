@@ -17,4 +17,4 @@ class StaticData:
     good_files_dir: str = join(project_dir, 'tests', 'assets', 'good_files')
     lic_file_path: str = join(project_dir, 'tests', 'assets', 'test_lic.lickey')
     config: json = FileUtils.read_json(join(project_dir, 'config.json'))
-    cache_dir: str = config.get("cache_dir") if config.get("cache_dir") else None
+    cache_dir: str = config.get("cache_dir", None)

@@ -10,7 +10,7 @@ exceptions = ['python']
 Python36 = {
     "opencv-python": "4.3.0.38",
     "rich": "12.6.0",
-	"mss": "7.0.1"
+    "mss": "7.0.1"
 }
 
 def write(text, mode='w'):

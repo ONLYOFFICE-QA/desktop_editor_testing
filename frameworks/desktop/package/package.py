@@ -7,8 +7,8 @@ from frameworks.decorators.decorators import highlighter
 
 from .url_generator import UrlGenerator
 from ..data import Data
-from ..desktop_exceptions import PackageException
 
+class PackageException(Exception): ...
 
 class Package:
     def __init__(self, data: Data):
@@ -49,10 +49,10 @@ class Package:
             print(f"[red]|ERROR| Package not exists.")
 
     def _get_install_command(self):
-        if self.package_path.endswith('.deb'):
+        if self.package_path.lower().endswith('.deb'):
             self._unlock_dpkg()
             return f'sudo dpkg -i {self.package_path}'
-        elif self.package_path.endswith('.rpm'):
+        elif self.package_path.lower().endswith('.rpm'):
             return f'sudo rpm -i {self.package_path}'
         else:
             raise PackageException(

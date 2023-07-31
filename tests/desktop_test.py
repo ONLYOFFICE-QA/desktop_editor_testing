@@ -8,14 +8,17 @@ from rich import print
 from rich.console import Console
 from pyvirtualdisplay import Display
 
-from frameworks.desktop import DesktopEditor, DesktopData
+from frameworks.desktop import DesktopEditor, DesktopData, DesktopException, UrlException, PackageException
 from frameworks.StaticData import StaticData
 from frameworks.host_control import FileUtils, HostInfo
 from frameworks.image_handler import Image
 from tests.tools.desktop_report import DesktopReport
+
 console = Console()
 
+
 class TestException(Exception): ...
+
 
 class DesktopTest:
     def __init__(
@@ -31,8 +34,8 @@ class DesktopTest:
         self.version = version
         self.display_on = display_on
         self._create_display()
-        self.report = DesktopReport(self._report_path())
         self.host_name = re.sub(r"[\s/]", "", HostInfo().name(pretty=True))
+        self.report = DesktopReport(self._report_path())
         self.img_dir = StaticData.img_template
         self.bad_files = StaticData.bad_files_dir
         self.good_files = StaticData.good_files_dir
@@ -44,46 +47,32 @@ class DesktopTest:
         self.check_installed()
         self.check_correct_version()
         self.desktop.set_license()
-        self.wait_until_open(self.desktop.open(), '[DesktopEditors]: start page loaded')
-        self.check_open_files()
+        self.check_open_desktop(self.desktop.open(), '[DesktopEditors]: start page loaded')
+        self.check_open_files(self.good_files)
         self._write_results(f'Passed')
         self.desktop.close()
         self.display.stop() if self.display_on else ...
 
-    def check_open_files(self):
-        for file in FileUtils.get_paths(self.good_files):
-            if basename(file) in self.config.get('exception_files') if self.config.get('exception_files') else []:
+    def check_open_files(self, files_dir: str):
+        for file in FileUtils.get_paths(files_dir):
+            if basename(file) in self.config.get('exception_files', []):
                 print(f"[green]|INFO| File `{basename(file)}` skipped to open.")
                 continue
             print(f"[green]|INFO| Test opening file: {basename(file)}")
             self.desktop.open(file)
-            time.sleep(25) # TODO
+            time.sleep(15)  # TODO
             self.check_error_on_screen()
             Image.make_screenshot(f"{join(self.report.dir, f'{self.version}_{self.host_name}_{basename(file)}.png')}")
 
-    def check_error_on_screen(self):
-        for error_img in FileUtils.get_paths(join(self.img_dir, 'errors')):
-            if Image.is_present(error_img):
-                Image.make_screenshot(f"{join(self.report.dir, f'{self.version}_{self.host_name}_error_screen.png')}")
-                self._write_results('ERROR')
-                raise TestException(f"[red]|ERROR| An error has been detected.")
-
-    def wait_until_open(self, process: Popen, wait_msg: str, timeout: int = 30):
-        start_time = time.time()
-        with console.status('') as status:
-            while time.time() - start_time < timeout:
-                status.update(f'[green]|INFO| Wait until the editor opens')
-                output = process.stdout.readline().decode().strip()
-                if output:
-                    console.print(f"[cyan]|INFO| {output}")
-                    if wait_msg in output:
-                        print(f"[green]|INFO| Opened.")
-                        self.check_error_on_screen()
-                        break
-            else:
-                self._write_results('NOT_OPENED')
-                raise TestException("[red]|ERROR| Can't open desktop editor")
+    def check_open_desktop(self, stdout_process: Popen, wait_msg: str, timeout: int = 30):
+        try:
+            self.desktop.wait_until_open(stdout_process, wait_msg, timeout=timeout)
+            time.sleep(1)  # todo
+            self.check_error_on_screen()
             Image.make_screenshot(f"{join(self.report.dir, f'{self.version}_{self.host_name}_open_editor.png')}")
+        except DesktopException:
+            self._write_results('NOT_OPENED')
+            raise TestException("[red]|ERROR| Can't open desktop editor")
 
     def check_installed(self):
         installed_version = self.desktop.version()
@@ -95,10 +84,17 @@ class DesktopTest:
             )
 
     def check_correct_version(self):
-        version =  self.desktop.version()
+        version = self.desktop.version()
         if len([i for i in version.split('.') if i]) != 4:
             self._write_results('INCORRECT_VERSION')
             raise TestException(f"[red]|ERROR| The version is not correct: {version}")
+
+    def check_error_on_screen(self):
+        for error_img in FileUtils.get_paths(join(self.img_dir, 'errors')):
+            if Image.is_present(error_img):
+                Image.make_screenshot(join(self.report.dir, f'{self.version}_{self.host_name}_error_screen.png'))
+                self._write_results('ERROR')
+                raise TestException(f"[red]|ERROR| An error has been detected.")
 
     def _write_results(self, exit_code: str):
         self.report.write(
@@ -111,9 +107,12 @@ class DesktopTest:
 
     def _install_package(self):
         if self.version == self.desktop.version():
-            print(f'[green]|INFO| Desktop version: {self.version} already installed[/]')
-            return
-        self.desktop.package.get()
+            return print(f'[green]|INFO| Desktop version: {self.version} already installed[/]')
+        try:
+            self.desktop.package.get()
+        except (UrlException, PackageException) as e:
+            self._write_results('CANT_GET_PACKAGE')
+            raise TestException(f"[red]|ERROR| Can't get the desktop package. Error: {e}")
 
     def _create_display(self, visible: bool = False, size: tuple = (1920, 1080)):
         if self.display_on:
@@ -135,5 +134,5 @@ class DesktopTest:
         )
 
     def _report_path(self):
-        title = self.config.get('title')
+        title = self.config.get('title', 'Undefined_title')
         return join(StaticData.reports_dir, title, self.version, f"{self.version}_{title}_report.csv")
