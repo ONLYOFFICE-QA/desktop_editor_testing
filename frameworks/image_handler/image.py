@@ -3,9 +3,7 @@
 import cv2
 import numpy as np
 
-import mss
-import mss.tools
-
+from PIL import Image, ImageGrab
 
 class Image:
 
@@ -38,12 +36,10 @@ class Image:
         return True if max_val >= threshold else False
 
     @staticmethod
-    def grab_coordinate(window_coordinates: tuple = None, monitor_num: int = 1) -> np.array:
-        with mss.mss() as sct:
-            if isinstance(window_coordinates, tuple):
-                left, top, right, bottom = window_coordinates
-                return np.array(sct.grab({"left": left, "top": top, "width": right - left, "height": bottom - top}))
-            return np.array(sct.grab(sct.monitors[monitor_num]))
+    def grab_coordinate(window_coordinates: tuple = None) -> np.array:
+        if isinstance(window_coordinates, tuple):
+            return np.array(ImageGrab.grab(bbox=window_coordinates))
+        return np.array(ImageGrab.grab())
 
     @staticmethod
     def find_contours(img):
@@ -75,13 +71,5 @@ class Image:
         cv2.putText(cv2_opened_image, text, (20, 35), cv2.FONT_HERSHEY_COMPLEX, 1, color=(0, 0, 255), thickness=2)
 
     @staticmethod
-    def make_screenshot_by_coordinante(img_path: str, coordinate: tuple) -> None:
-        left, top, right, bottom = coordinate
-        with mss.mss() as sct:
-            img = sct.grab({"left": left, "top": top, "width": right - left, "height": bottom - top})
-            mss.tools.to_png(img.rgb, img.size, output=img_path)
-
-    @staticmethod
     def make_screenshot(img_path: str) -> None:
-        with mss.mss() as sct:
-            sct.shot(output=img_path)
+        ImageGrab.grab().save(img_path, compression=None)
