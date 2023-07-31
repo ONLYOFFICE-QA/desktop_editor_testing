@@ -1,7 +1,7 @@
 {
   "title": "ONLYOFFICE",
   "host": "https://s3.eu-west-1.amazonaws.com/repo-doc-onlyoffice-com/desktop",
-  "cef107_system": [],
+  "cef107_system": ["ubuntu 14.04"],
   "os_family": {
     "debian": ["debian", "ubuntu", "linuxmint", "pop"],
     "rhel": ["centos", "redos", "altlinux", "fedora"],
