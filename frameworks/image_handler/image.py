@@ -37,12 +37,15 @@ class Image:
 
     @staticmethod
     def grab_coordinate(window_coordinates: tuple = None) -> np.array:
+        """
+        :param window_coordinates: (left, top, right, bottom)
+        """
         if isinstance(window_coordinates, tuple):
             return np.array(ImageGrab.grab(bbox=window_coordinates))
         return np.array(ImageGrab.grab())
 
     @staticmethod
-    def find_contours(img):
+    def find_contours(img: np.ndarray):
         rgb, gray = cv2.cvtColor(img, cv2.COLOR_BGR2RGB), cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         _, binary = cv2.threshold(gray, 125, 255, cv2.THRESH_BINARY)
         contours, hierarchy = cv2.findContours(binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -63,13 +66,20 @@ class Image:
         return img_1, img_2
 
     @staticmethod
-    def save(path, img):
+    def save(path: str, img: np.ndarray):
         cv2.imwrite(path, img)
 
     @staticmethod
-    def put_text(cv2_opened_image, text: str):
+    def put_text(cv2_opened_image: np.ndarray, text: str):
         cv2.putText(cv2_opened_image, text, (20, 35), cv2.FONT_HERSHEY_COMPLEX, 1, color=(0, 0, 255), thickness=2)
 
     @staticmethod
-    def make_screenshot(img_path: str) -> None:
-        ImageGrab.grab().save(img_path, compression=None)
+    def make_screenshot(img_path: str, window_coordinates: tuple = None) -> None:
+        """
+        :param img_path: Path to save an image
+        :param window_coordinates: (left, top, right, bottom)
+        """
+        if isinstance(window_coordinates, tuple):
+            ImageGrab.grab(bbox=window_coordinates).save(img_path, compression=None)
+        else:
+            ImageGrab.grab().save(img_path, compression=None)
