@@ -14,9 +14,9 @@ psutil = "*"
 requests = "*"
 distro = "*"
 pyvirtualdisplay = "*"
-mss = "*"
 opencv-python = "*"
 urllib3 = '*'
+pillow = '*'
 
 
 [build-system]
