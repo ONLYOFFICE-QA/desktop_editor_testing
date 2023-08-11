@@ -46,7 +46,7 @@ class Package:
             print(f"[green]|INFO| Installing Desktop version: {self.version}")
             call(self._get_install_command(), shell=True)
         else:
-            print(f"[red]|ERROR| Package not exists.")
+            raise PackageException(f"[red]|ERROR| Package not exists.")
 
     def _get_install_command(self):
         if self.package_path.lower().endswith('.deb'):
