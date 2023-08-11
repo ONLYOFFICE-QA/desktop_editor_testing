@@ -52,7 +52,6 @@ class DesktopEditor:
                     f"[red]|ERROR| The waiting time {timeout} seconds for the editor to open has expired."
                 )
 
-
     def version(self) -> "str | None":
         version = re.findall(
             r"\d+\.\d+\.\d+\.\d+",
