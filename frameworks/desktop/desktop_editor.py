@@ -81,7 +81,6 @@ class DesktopEditor:
             FileUtils.create_dir(license_dir, stdout=False)
             FileUtils.copy(self.lic_file_path, join(license_dir, basename(self.lic_file_path)))
             return print(f"[green]|INFO| Desktop activated")
-        print("[green]|INFO| Free license")
 
     def _generate_running_command(self):
         run_cmd = self.config.get(f'{HostInfo().os}_run_command')
