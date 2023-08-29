@@ -43,7 +43,7 @@ class DesktopTest:
         FileUtils.create_dir(self.report.dir, stdout=False)
 
     def run(self):
-        self._install_package()
+        self.install_package()
         self.check_installed()
         self.check_correct_version()
         self.desktop.set_license()
@@ -96,6 +96,15 @@ class DesktopTest:
                 self._write_results('ERROR')
                 raise TestException(f"[red]|ERROR| An error has been detected.")
 
+    def install_package(self):
+        if self.version == self.desktop.version():
+            return print(f'[green]|INFO| Desktop version: {self.version} already installed[/]')
+        try:
+            self.desktop.package.get()
+        except (UrlException, PackageException) as e:
+            self._write_results('CANT_GET_PACKAGE')
+            raise TestException(f"[red]|ERROR| Can't get the desktop package. Error: {e}")
+
     def _write_results(self, exit_code: str):
         self.report.write(
             os=HostInfo().name(pretty=True),
@@ -105,21 +114,12 @@ class DesktopTest:
             tg_msg=self.telegram_report
         )
 
-    def _install_package(self):
-        if self.version == self.desktop.version():
-            return print(f'[green]|INFO| Desktop version: {self.version} already installed[/]')
-        try:
-            self.desktop.package.get()
-        except (UrlException, PackageException) as e:
-            self._write_results('CANT_GET_PACKAGE')
-            raise TestException(f"[red]|ERROR| Can't get the desktop package. Error: {e}")
-
     def _create_display(self, visible: bool = False, size: tuple = (1920, 1080)):
         if self.display_on:
             self.display = Display(visible=visible, size=size)
             self.display.start()
         else:
-            print("[red]|INFO| Test running without virtual display")
+            print("[green]|INFO| Test running without virtual display")
 
     def _create_desktop(self, custom_config: str, license_file_path: str):
         return DesktopEditor(

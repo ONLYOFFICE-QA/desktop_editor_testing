@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from os.path import isfile, join, dirname, realpath
+from rich import print
+
 from frameworks.host_control import HostInfo, FileUtils
 from frameworks.desktop.handlers.VersionHandler import VersionHandler
 from ..data import Data
