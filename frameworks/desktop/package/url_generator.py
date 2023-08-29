@@ -34,9 +34,11 @@ class UrlGenerator:
         for os_family, distributions in self.config['os_family'].items():
             if self.host_name in distributions:
                 return os_family
-        raise UrlException(f"[red]|ERROR| Can't verify os family for download desktop package.\n"
-                    f"host name: {self.host_name}\n"
-                    f"version: {self.host_version}")
+        raise UrlException(
+            f"[red]|ERROR| Can't verify os family for download desktop package.\n"
+            f"host name: {self.host_name}\n"
+            f"version: {self.host_version}"
+        )
 
     @property
     def _version_for_url(self):

@@ -52,7 +52,6 @@ class DesktopEditor:
                     f"[red]|ERROR| The waiting time {timeout} seconds for the editor to open has expired."
                 )
 
-
     def version(self) -> "str | None":
         version = re.findall(
             r"\d+\.\d+\.\d+\.\d+",
@@ -78,11 +77,10 @@ class DesktopEditor:
 
     def set_license(self):
         license_dir = self.config.get(f"lic_dir_{HostInfo().os}")
-        if license_dir:
-            if license_dir and isfile(self.lic_file_path):
-                FileUtils.create_dir(license_dir, stdout=False)
-                FileUtils.copy(self.lic_file_path, join(license_dir, basename(self.lic_file_path)))
-                return print(f"[green]|INFO| Desktop activated")
+        if license_dir and isfile(self.lic_file_path):
+            FileUtils.create_dir(license_dir, stdout=False)
+            FileUtils.copy(self.lic_file_path, join(license_dir, basename(self.lic_file_path)))
+            return print(f"[green]|INFO| Desktop activated")
         print("[green]|INFO| Free license")
 
     def _generate_running_command(self):
