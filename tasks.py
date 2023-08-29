@@ -5,22 +5,22 @@ from tests.desktop_test import DesktopTest
 
 
 @task
-def desktop_test(c, version=None, display=False, custom_config=None, telegram=False, license_file_path=None):
+def desktop_test(c, version=None, display=False, config=None, telegram=False, license=None):
     DesktopTest(
         version=version,
-        display_on=True if not display else False,
-        custom_config=custom_config if custom_config else None,
+        virtual_display=display,
+        custom_config=config if config else None,
         telegram=telegram,
-        license_file_path=license_file_path
+        license_file_path=license
     ).run()
 
 @task
-def install(c, version=None, custom_config=None, license_file_path=None):
+def install(c, version=None, config=None, license=None):
     test = DesktopTest(
         version=version,
-        display_on=False,
-        custom_config=custom_config if custom_config else None,
-        license_file_path=license_file_path
+        virtual_display=False,
+        custom_config=config if config else None,
+        license_file_path=license
     )
     test.install_package()
     test.check_installed()
