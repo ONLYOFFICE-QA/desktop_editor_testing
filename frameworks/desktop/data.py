@@ -2,6 +2,8 @@
 from typing import NamedTuple
 import tempfile
 
+print(tempfile.gettempdir())
+
 class Data(NamedTuple):
     version: str
     tmp_dir: str = tempfile.gettempdir()
