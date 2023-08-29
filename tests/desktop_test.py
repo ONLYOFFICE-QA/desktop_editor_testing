@@ -25,14 +25,14 @@ class DesktopTest:
             self,
             version: str,
             custom_config: str = None,
-            display_on: bool = True,
+            virtual_display: bool = True,
             telegram: bool = False,
             license_file_path: str = None
     ):
         self.config = FileUtils.read_json(custom_config) if custom_config else StaticData.config
         self.telegram_report = telegram
         self.version = version
-        self.display_on = display_on
+        self.virtual_display = virtual_display
         self._create_display()
         self.host_name = re.sub(r"[\s/]", "", HostInfo().name(pretty=True))
         self.report = DesktopReport(self._report_path())
@@ -51,7 +51,7 @@ class DesktopTest:
         self.check_open_files(self.good_files)
         self._write_results(f'Passed')
         self.desktop.close()
-        self.display.stop() if self.display_on else ...
+        self.display.stop() if self.virtual_display else ...
 
     def check_open_files(self, files_dir: str):
         for file in FileUtils.get_paths(files_dir):
@@ -115,11 +115,10 @@ class DesktopTest:
         )
 
     def _create_display(self, visible: bool = False, size: tuple = (1920, 1080)):
-        if self.display_on:
+        if self.virtual_display:
+            print("[green]|INFO| The test is running on the virtual display")
             self.display = Display(visible=visible, size=size)
             self.display.start()
-        else:
-            print("[green]|INFO| Test running without virtual display")
 
     def _create_desktop(self, custom_config: str, license_file_path: str):
         return DesktopEditor(
