@@ -2,10 +2,11 @@
 import json
 from os.path import join, getsize, basename, isdir, expanduser, isfile
 
+import tempfile
 import requests
 from rich import print
 
-from frameworks.StaticData import StaticData
+
 from frameworks.decorators import singleton
 from frameworks.host_control import FileUtils
 
@@ -15,7 +16,7 @@ class Telegram:
     def __init__(self):
         self._telegram_token = self._get_token()
         self._chat_id = self._get_chat_id()
-        self.tmp_dir = StaticData.tmp_dir
+        self.tmp_dir = tempfile.gettempdir()
         FileUtils.create_dir(self.tmp_dir, stdout=False)
 
     @staticmethod

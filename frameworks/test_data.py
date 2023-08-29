@@ -8,7 +8,7 @@ from os.path import join
 from frameworks.host_control import FileUtils
 
 dataclass(frozen=True)
-class StaticData:
+class TestData:
     project_dir: str = getcwd()
     tmp_dir: str = join(project_dir, 'tmp')
     reports_dir: str = join(project_dir, 'reports')

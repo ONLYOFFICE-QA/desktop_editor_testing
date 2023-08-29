@@ -9,7 +9,7 @@ from rich.console import Console
 from pyvirtualdisplay import Display
 
 from frameworks.desktop import DesktopEditor, DesktopData, DesktopException, UrlException, PackageException
-from frameworks.StaticData import StaticData
+from frameworks.test_data import TestData
 from frameworks.host_control import FileUtils, HostInfo
 from frameworks.image_handler import Image
 from tests.tools.desktop_report import DesktopReport
@@ -29,16 +29,16 @@ class DesktopTest:
             telegram: bool = False,
             license_file_path: str = None
     ):
-        self.config = FileUtils.read_json(custom_config) if custom_config else StaticData.config
+        self.config = FileUtils.read_json(custom_config) if custom_config else TestData.config
         self.telegram_report = telegram
         self.version = version
         self.virtual_display = virtual_display
         self._create_display()
         self.host_name = re.sub(r"[\s/]", "", HostInfo().name(pretty=True))
         self.report = DesktopReport(self._report_path())
-        self.img_dir = StaticData.img_template
-        self.bad_files = StaticData.bad_files_dir
-        self.good_files = StaticData.good_files_dir
+        self.img_dir = TestData.img_template
+        self.bad_files = TestData.bad_files_dir
+        self.good_files = TestData.good_files_dir
         self.desktop = self._create_desktop(custom_config, license_file_path)
         FileUtils.create_dir(self.report.dir, stdout=False)
 
@@ -124,14 +124,14 @@ class DesktopTest:
         return DesktopEditor(
             DesktopData(
                 version=self.version,
-                tmp_dir=StaticData.tmp_dir,
+                tmp_dir=TestData.tmp_dir,
                 debug_mode=True,
                 custom_config_path=custom_config,
-                lic_file=license_file_path if license_file_path else StaticData.lic_file_path,
-                cache_dir=StaticData.cache_dir
+                lic_file=license_file_path if license_file_path else TestData.lic_file_path,
+                cache_dir=TestData.cache_dir
             )
         )
 
     def _report_path(self):
         title = self.config.get('title', 'Undefined_title')
-        return join(StaticData.reports_dir, title, self.version, f"{self.version}_{title}_report.csv")
+        return join(TestData.reports_dir, title, self.version, f"{self.version}_{title}_report.csv")
