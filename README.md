@@ -24,7 +24,8 @@ A project for testing ONLYOFFICE Desktop.
 
 ## Sending messages to Telegram
 
-* To send test reports to Telegram, you need to add two files to the `~/.telegram` directory:
+* To send test reports to Telegram,
+you need to add two files to the `~/.telegram` directory:
   * `token` file containing the bot token
   * `chat` file with chat ID
 
