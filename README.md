@@ -58,7 +58,7 @@ to specify a custom configuration file
 
 ### Command for install desktop
 
-`invoke install -v <version>`
+`invoke install-desktop -v <version>`
 
 #### Flags
 

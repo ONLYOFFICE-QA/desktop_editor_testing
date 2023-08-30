@@ -15,7 +15,7 @@ def desktop_test(c, version=None, display=False, config=None, telegram=False, li
     ).run()
 
 @task
-def install(c, version=None, config=None, license=None):
+def install_desktop(c, version=None, config=None, license=None):
     test = DesktopTest(
         version=version,
         virtual_display=False,

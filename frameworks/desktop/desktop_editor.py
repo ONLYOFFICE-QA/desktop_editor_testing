@@ -25,23 +25,23 @@ class DesktopEditor:
         self.debug_command = f'--ascdesktop-log-file={"stdout" if HostInfo().os != "windows" else self.log_file}'
 
     def open(self, file_path: str = None) -> Popen:
-        return Popen(
+        command = (
             f"{self._generate_running_command()} "
             f"{self.debug_command if self.debug_mode else ''} "
-            f"{file_path if file_path else ''}".strip(),
-            stdout=PIPE,
-            stderr=PIPE,
-            shell=True
+            f"{file_path if file_path else ''}".strip()
         )
+        return Popen(command, stdout=PIPE, stderr=PIPE, shell=True)
 
     @staticmethod
-    def wait_until_open(stdout_process: Popen, wait_msg: str = '[DesktopEditors]: start page loaded', timeout: int = 30):
+    def wait_until_open(
+            stdout_process: Popen,
+            wait_msg: str = '[DesktopEditors]: start page loaded',
+            timeout: int = 30
+    ):
         start_time = time.time()
         with console.status('green]|INFO| Wait until desktop editor opens') as status:
             while (time.time() - start_time) < timeout:
-                status.update(
-                    f'[green]|INFO| Waiting for {wait_msg}: {timeout-(time.time() - start_time):.02f} seconds.'
-                )
+                status.update(f'[green]|INFO| Waiting for {wait_msg}: {timeout-(time.time() - start_time):.02f} sec.')
                 output = stdout_process.stdout.readline().decode().strip()
                 if output:
                     console.print(f"[cyan]|INFO| {output}")
@@ -64,7 +64,7 @@ class DesktopEditor:
         # call('killall DesktopEditors', shell=True) -> segmentation fault in stdout
         ...
 
-    def read_log(self, wait_msg):
+    def read_log(self, wait_msg: str):
         for line in FileUtils.file_reader(self.log_file).split('\n'):
             print(line) if line else ...
             if wait_msg == line.strip():
@@ -81,10 +81,9 @@ class DesktopEditor:
             FileUtils.create_dir(license_dir, stdout=False)
             FileUtils.copy(self.lic_file_path, join(license_dir, basename(self.lic_file_path)))
             return print(f"[green]|INFO| Desktop activated")
-        print("[green]|INFO| Free license")
 
     def _generate_running_command(self):
-        run_cmd = self.config.get(f'{HostInfo().os}_run_command')
+        run_cmd = self.config.get(f'{HostInfo().os}_run_command', None)
         if run_cmd:
             return run_cmd
         raise ValueError(f"[red]|ERROR| Can't get running command, key: {HostInfo().os}_run_command")
