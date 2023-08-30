@@ -24,10 +24,10 @@ A project for testing ONLYOFFICE Desktop.
 
 ## Sending messages to Telegram
 
-* To send test reports to Telegram, you need to add two files to the `~/.telegram` directory:
-    * `token` file containing the bot token
-    * `chat` file with chat ID
-
+* To send test reports to Telegram,
+you need to add two files to the `~/.telegram` directory:
+  * `token` file containing the bot token
+  * `chat` file with chat ID
 
 ## Getting Started
 
@@ -39,20 +39,20 @@ A project for testing ONLYOFFICE Desktop.
 
 `invoke desktop-test -v <version>`
 
-#### Flags
+#### Flags desktop-test command
 
 `-v <version>` or `--version <version>` - specifies a testing version
 
 `-d` or `--display` - to run tests in virtual display
 
-`-c <path to custom config.json>` or `--config <path to custom config.json>` - 
+`-c <path to custom config.json>` or `--config <path to custom config.json>` -
 to specify a custom configuration file
 
 `-t` or `--telegram` - to send the report to telegram
 
 `-l` or `--license` - to specify the license file
 
-####   Example command:
+#### Example desktop-test command
 
 `invoke desktop-test -d -t -v 7.4.1.36 -c ./my_config.json`
 
@@ -60,17 +60,17 @@ to specify a custom configuration file
 
 `invoke install-desktop -v <version>`
 
-#### Flags
+#### Flags install-desktop command
 
 `-v <version>` or `--version <version>` - specifies a testing version
 
-`-c <path to custom config.json>` or `--config <path to custom config.json>` - 
+`-c <path to custom config.json>` or `--config <path to custom config.json>` -
 to specify a custom configuration file
 
 `-t` or `--telegram` - to send the report to telegram
 
 `-l` or `--license` - to specify the license file
 
-#### Example command:
+#### Example install-desktop command
 
 `invoke install -t -v 7.4.1.36 -c ./my_config.json`
