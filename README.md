@@ -35,11 +35,11 @@ you need to add two files to the `~/.telegram` directory:
 
 `source ./venv/bin/activate`
 
-### Command for starting desktop tests
+### Command for starting desktop open test
 
-`invoke desktop-test -v <version>`
+`invoke open-test -v <version>`
 
-#### Flags desktop-test command
+#### Flags open-test command
 
 `-v <version>` or `--version <version>` - specifies a testing version
 
@@ -52,7 +52,7 @@ to specify a custom configuration file
 
 `-l` or `--license` - to specify the license file
 
-#### Example desktop-test command
+#### Example open-test command
 
 `invoke desktop-test -d -t -v 7.4.1.36 -c ./my_config.json`
 
