@@ -33,6 +33,7 @@ class DesktopTests:
         self.config = FileUtils.read_json(custom_config) if custom_config else TestData.config
         self.telegram_report = telegram
         self.version = version
+        self.old_version = old_version
         self.virtual_display = virtual_display
         self._create_display()
         self.host_name = re.sub(r"[\s/]", "", HostInfo().name(pretty=True))
@@ -45,7 +46,7 @@ class DesktopTests:
         FileUtils.create_dir(self.report.dir, stdout=False)
 
     def open_test(self):
-        self.install_package(self.desktop)
+        self.install_package(self.version, self.desktop)
         self.check_installed()
         self.check_correct_version()
         self.desktop.set_license()
@@ -56,7 +57,7 @@ class DesktopTests:
         self.display.stop() if self.virtual_display else ...
 
     def update_test(self):
-        self.install_package(self.old_desktop)
+        self.install_package(self.old_version, self.old_desktop)
         self.open_test()
 
     def check_open_files(self, files_dir: str):
@@ -102,8 +103,8 @@ class DesktopTests:
                 self._write_results('ERROR')
                 raise TestException(f"[red]|ERROR| An error has been detected.")
 
-    def install_package(self, desktop: DesktopEditor) -> None:
-        if self.version == self.desktop.version():
+    def install_package(self, version: str, desktop: DesktopEditor) -> None:
+        if version == self.desktop.version():
             return print(f'[green]|INFO| Desktop version: {self.version} already installed[/]')
         try:
             desktop.package.get()
