@@ -12,20 +12,20 @@ class DesktopReport:
         self.path = report_path
         self.dir = dirname(self.path)
 
-    def write(self, os: str, version: str, package_name: str, exit_code: str, tg_msg: bool = False):
+    def write(self, os: str, version: str, package_name: str, exit_code: str, tg_msg: bool = False, update_from: str = None):
         self._write_titles() if not isfile(self.path) else ...
         self._writer(mode='a', message=[os, version, package_name, exit_code])
-        self.send_to_telegram(exit_code, package_name, version) if tg_msg else ...
+        self.send_to_telegram(exit_code, package_name, version, update_from) if tg_msg else ...
 
-    def send_to_telegram(self, results: str, package_name: str, version: str):
+    def send_to_telegram(self, results: str, package_name: str, version: str, update_from):
         pkg_name = re.sub(r"[\s/_]", "", package_name)
         Telegram().send_media_group(
             document_paths=FileUtils.get_paths(self.dir, extension='.png'),
             media_type='photo',
             caption=f'Os: `{HostInfo().name(pretty=True)}`\n'
-                    f'Version: `{version}`\n'
+                    f'Version: `{(update_from + "-") if update_from else ""}{version}`\n'
                     f'Package: `{pkg_name}`\n'
-                    f'Result: `{results if results == "Passed" else "Error"}`'
+                    f'Result: `{results}`'
         )
 
     def _writer(self, mode: str, message: list, delimiter='\t', encoding='utf-8'):
