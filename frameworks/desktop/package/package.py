@@ -53,7 +53,7 @@ class Package:
             self._unlock_dpkg()
             return f'sudo dpkg -i {self.path}'
         elif self.path.lower().endswith('.rpm'):
-            return f'sudo yum install {self.path}'
+            return f'sudo yum install -y {self.path}'
         else:
             raise PackageException(
                 f"[red]|ERROR| Unable to generate a command to install the desktop package.\n"
