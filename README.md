@@ -73,4 +73,4 @@ to specify a custom configuration file
 
 #### Example install-desktop command
 
-`invoke install -t -v 7.4.1.36 -c ./my_config.json`
+`invoke install-desktop -t -v 7.4.1.36 -c ./my_config.json`
