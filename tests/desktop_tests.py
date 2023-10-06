@@ -20,10 +20,11 @@ console = Console()
 class TestException(Exception): ...
 
 
-class DesktopTest:
+class DesktopTests:
     def __init__(
             self,
             version: str,
+            old_version: str = None,
             custom_config: str = None,
             virtual_display: bool = True,
             telegram: bool = False,
@@ -39,11 +40,12 @@ class DesktopTest:
         self.img_dir = TestData.img_template
         self.bad_files = TestData.bad_files_dir
         self.good_files = TestData.good_files_dir
-        self.desktop = self._create_desktop(custom_config, license_file_path)
+        self.desktop = self._create_desktop(self.version, custom_config, license_file_path)
+        self.old_desktop = self._create_desktop(old_version, custom_config, license_file_path) if old_version else None
         FileUtils.create_dir(self.report.dir, stdout=False)
 
-    def run(self):
-        self.install_package()
+    def open_test(self):
+        self.install_package(self.desktop)
         self.check_installed()
         self.check_correct_version()
         self.desktop.set_license()
@@ -52,6 +54,10 @@ class DesktopTest:
         self._write_results(f'Passed')
         self.desktop.close()
         self.display.stop() if self.virtual_display else ...
+
+    def update_test(self):
+        self.install_package(self.old_desktop)
+        self.open_test()
 
     def check_open_files(self, files_dir: str):
         for file in FileUtils.get_paths(files_dir):
@@ -96,11 +102,11 @@ class DesktopTest:
                 self._write_results('ERROR')
                 raise TestException(f"[red]|ERROR| An error has been detected.")
 
-    def install_package(self):
+    def install_package(self, desktop: DesktopEditor) -> None:
         if self.version == self.desktop.version():
             return print(f'[green]|INFO| Desktop version: {self.version} already installed[/]')
         try:
-            self.desktop.package.get()
+            desktop.package.get()
         except (UrlException, PackageException) as e:
             self._write_results('CANT_GET_PACKAGE')
             raise TestException(f"[red]|ERROR| Can't get the desktop package. Error: {e}")
@@ -120,10 +126,11 @@ class DesktopTest:
             self.display = Display(visible=visible, size=size)
             self.display.start()
 
-    def _create_desktop(self, custom_config: str, license_file_path: str):
+    @staticmethod
+    def _create_desktop(version: str, custom_config: str, license_file_path: str):
         return DesktopEditor(
             DesktopData(
-                version=self.version,
+                version=version,
                 tmp_dir=TestData.tmp_dir,
                 custom_config_path=custom_config,
                 lic_file=license_file_path if license_file_path else TestData.lic_file_path,
