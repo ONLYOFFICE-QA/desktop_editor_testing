@@ -21,7 +21,7 @@ class Package:
         self.path: str = join(self.download_dir, self.name)
         FileUtils.create_dir(self.download_dir, stdout=False)
 
-    def get(self) -> "None":
+    def get(self) -> None:
         headers = FileUtils.get_headers(self.url)
         if self.exists(headers):
             print(f"[green]|INFO| Package {self.name} already exists. Path: {self.path}")
