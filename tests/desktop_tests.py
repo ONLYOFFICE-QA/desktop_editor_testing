@@ -46,6 +46,8 @@ class DesktopTests:
         FileUtils.create_dir(self.report.dir, stdout=False)
 
     def open_test(self):
+        if self.old_version:
+            self.install_package(self.old_version, self.old_desktop)
         self.install_package(self.version, self.desktop)
         self.check_installed()
         self.check_correct_version()
@@ -55,10 +57,6 @@ class DesktopTests:
         self._write_results(f'Passed')
         self.desktop.close()
         self.display.stop() if self.virtual_display else ...
-
-    def update_test(self):
-        self.install_package(self.old_version, self.old_desktop)
-        self.open_test()
 
     def check_open_files(self, files_dir: str):
         for file in FileUtils.get_paths(files_dir):
