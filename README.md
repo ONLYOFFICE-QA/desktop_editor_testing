@@ -54,7 +54,7 @@ to specify a custom configuration file
 
 #### Example open-test command
 
-`invoke desktop-test -d -t -v 7.4.1.36 -c ./my_config.json`
+`invoke open-test -d -t -v 7.4.1.36 -c ./my_config.json`
 
 ### Command for install desktop
 
