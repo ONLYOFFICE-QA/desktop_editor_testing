@@ -103,11 +103,13 @@ class DesktopTests:
 
     def install_package(
             self,
-            version: str,
-            desktop: DesktopEditor,
+            version: str = None,
+            desktop: DesktopEditor = None,
             yum_installer: bool = False,
             apt_get_installer: bool = False
     ) -> None:
+        version = version if version else self.version
+        desktop = desktop if desktop else self.desktop
         if version == self.desktop.version():
             return print(f'[green]|INFO| Desktop version: {self.version} already installed[/]')
         try:
