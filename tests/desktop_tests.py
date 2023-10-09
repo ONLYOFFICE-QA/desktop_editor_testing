@@ -48,7 +48,7 @@ class DesktopTests:
     def open_test(self):
         if self.update_from:
             self.install_package(self.update_from, self.old_desktop, yum_installer=True)
-        self.install_package(self.version, self.desktop, yum_installer=True)
+        self.install_package(self.version, self.desktop, yum_installer=True if self.update_from else False)
         self.check_installed()
         self.check_correct_version()
         self.desktop.set_license()
