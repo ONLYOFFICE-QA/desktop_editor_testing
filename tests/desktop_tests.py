@@ -24,7 +24,7 @@ class DesktopTests:
     def __init__(
             self,
             version: str,
-            old_version: str = None,
+            update_from: str = None,
             custom_config: str = None,
             virtual_display: bool = True,
             telegram: bool = False,
@@ -33,7 +33,7 @@ class DesktopTests:
         self.config = FileUtils.read_json(custom_config) if custom_config else TestData.config
         self.telegram_report = telegram
         self.version = version
-        self.old_version = old_version
+        self.update_from = update_from
         self.virtual_display = virtual_display
         self._create_display()
         self.host_name = re.sub(r"[\s/]", "", HostInfo().name(pretty=True))
@@ -42,13 +42,13 @@ class DesktopTests:
         self.bad_files = TestData.bad_files_dir
         self.good_files = TestData.good_files_dir
         self.desktop = self._create_desktop(self.version, custom_config, license_file_path)
-        self.old_desktop = self._create_desktop(old_version, custom_config, license_file_path) if old_version else None
+        self.old_desktop = self._create_desktop(update_from, custom_config, license_file_path) if update_from else None
         FileUtils.create_dir(self.report.dir, stdout=False)
 
     def open_test(self):
-        if self.old_version:
-            self.install_package(self.old_version, self.old_desktop)
-        self.install_package(self.version, self.desktop)
+        if self.update_from:
+            self.install_package(self.update_from, self.old_desktop, yum_installer=True)
+        self.install_package(self.version, self.desktop, yum_installer=True)
         self.check_installed()
         self.check_correct_version()
         self.desktop.set_license()
@@ -101,11 +101,18 @@ class DesktopTests:
                 self._write_results('ERROR')
                 raise TestException(f"[red]|ERROR| An error has been detected.")
 
-    def install_package(self, version: str, desktop: DesktopEditor) -> None:
+    def install_package(
+            self,
+            version: str,
+            desktop: DesktopEditor,
+            yum_installer: bool = False,
+            apt_get_installer: bool = False
+    ) -> None:
         if version == self.desktop.version():
             return print(f'[green]|INFO| Desktop version: {self.version} already installed[/]')
         try:
             desktop.package.get()
+            desktop.package.install(yum_installer=yum_installer, apt_get_installer=apt_get_installer)
         except (UrlException, PackageException) as e:
             self._write_results('CANT_GET_PACKAGE')
             raise TestException(f"[red]|ERROR| Can't get the desktop package. Error: {e}")

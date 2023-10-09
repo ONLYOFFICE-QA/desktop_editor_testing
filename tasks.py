@@ -8,7 +8,7 @@ from tests.desktop_tests import DesktopTests
 def open_test(c, version=None, update_from=None, display=False, config=None, telegram=False, license=None):
     DesktopTests(
         version=version,
-        old_version=update_from,
+        update_from=update_from,
         virtual_display=display,
         custom_config=config if config else None,
         telegram=telegram,

@@ -27,7 +27,6 @@ class Package:
             print(f"[green]|INFO| Package {self.name} already exists. Path: {self.path}")
         else:
             self.download() if headers else print(f"[red]|WARNING| Package does not exist on aws")
-        self.install()
 
     @highlighter(color='green')
     def download(self) -> None:
@@ -41,19 +40,23 @@ class Package:
             return True
         return False
 
-    def install(self) -> None:
+    def install(self, yum_installer: bool = False, apt_get_installer: bool = False) -> None:
         print(f"[green]|INFO| Installing Desktop version: {self.version}\nPackage: {self.name}")
         if isfile(self.path):
-            call(self._get_install_command(), shell=True)
+            call(self._get_install_command(yum_installer, apt_get_installer), shell=True)
         else:
             raise PackageException(f"[red]|ERROR| Package not exists.")
 
-    def _get_install_command(self) -> str:
+    def _get_install_command(self, yum_installer: bool, apt_get_installer: bool) -> str:
         if self.path.lower().endswith('.deb'):
             self._unlock_dpkg()
-            return f'sudo dpkg -i {self.path}'
+            if apt_get_installer:
+                return f"sudo apt-get install -y {self.path}"
+            return f"sudo dpkg -i {self.path}"
         elif self.path.lower().endswith('.rpm'):
-            return f'sudo yum install -y {self.path}'
+            if yum_installer:
+                return f"sudo yum install -y {self.path}"
+            return f"sudo rpm -i {self.path}"
         else:
             raise PackageException(
                 f"[red]|ERROR| Unable to generate a command to install the desktop package.\n"
