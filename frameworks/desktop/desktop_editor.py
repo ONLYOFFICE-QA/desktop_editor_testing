@@ -15,20 +15,21 @@ class DesktopException(Exception): ...
 class DesktopEditor:
     def __init__(self, data: Data):
         self.lic_file_path = data.lic_file
-        self.debug_mode = data.debug_mode
         self.config = self._get_config(data.custom_config_path)
         self.package = Package(data)
         self.os = HostInfo().os
         self.tmp_dir = data.tmp_dir
         self.log_file = join(self.tmp_dir, "desktop.log")
         self.create_log_file()
-        self.debug_command = f'--ascdesktop-log-file={"stdout" if HostInfo().os != "windows" else self.log_file}'
+        self.debug_command = '--ascdesktop-support-debug-info'
+        self.log_out_command = f'--ascdesktop-log-file={"stdout" if HostInfo().os != "windows" else self.log_file}'
 
-    def open(self, file_path: str = None) -> Popen:
+    def open(self, file_path: str = None, debug_mode: bool = False, log_out_mode: bool = False) -> Popen:
         command = (
-            f"{self._generate_running_command()} "
-            f"{self.debug_command if self.debug_mode else ''} "
-            f"{file_path if file_path else ''}".strip()
+            f"{self._generate_running_command()}"
+            f"{(' ' + self.log_out_command) if log_out_mode else ''}"
+            f"{(' ' + self.debug_command) if debug_mode else ''}"
+            f"{(' ' + file_path) if file_path else ''}".strip()
         )
         return Popen(command, stdout=PIPE, stderr=PIPE, shell=True)
 

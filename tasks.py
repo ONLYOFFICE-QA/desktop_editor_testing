@@ -19,6 +19,7 @@ def install_desktop(c, version=None, config=None, license=None):
     test = DesktopTest(
         version=version,
         virtual_display=False,
+        debug_mode=True,
         custom_config=config if config else None,
         license_file_path=license
     )
@@ -27,4 +28,4 @@ def install_desktop(c, version=None, config=None, license=None):
     test.check_installed()
     test.check_correct_version()
     test.desktop.set_license()
-    test.desktop.open()
+    test.desktop.open(debug_mode=True)
