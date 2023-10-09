@@ -36,9 +36,7 @@ class Package:
     def exists(self, headers: "dict | None" = None) -> bool:
         if headers and isfile(self.path):
             return int(getsize(self.path)) == int(headers['Content-Length'])
-        elif isfile(self.path):
-            return True
-        return False
+        return isfile(self.path)
 
     def install(self, yum_installer: bool = False, apt_get_installer: bool = False) -> None:
         print(f"[green]|INFO| Installing Desktop version: {self.version}\nPackage: {self.name}")
