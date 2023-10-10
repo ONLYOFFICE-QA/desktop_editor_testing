@@ -27,7 +27,7 @@ class DesktopTest:
             custom_config: str = None,
             virtual_display: bool = True,
             telegram: bool = False,
-            license_file_path: str = None
+            license_file_path: str = None,
     ):
         self.config = FileUtils.read_json(custom_config) if custom_config else TestData.config
         self.telegram_report = telegram
@@ -47,7 +47,7 @@ class DesktopTest:
         self.check_installed()
         self.check_correct_version()
         self.desktop.set_license()
-        self.check_open_desktop(self.desktop.open(), '[DesktopEditors]: start page loaded')
+        self.check_open_desktop(self.desktop.open(log_out_mode=True), '[DesktopEditors]: start page loaded')
         self.check_open_files(self.good_files)
         self._write_results(f'Passed')
         self.desktop.close()
@@ -59,7 +59,7 @@ class DesktopTest:
                 print(f"[green]|INFO| File `{basename(file)}` skipped to open.")
                 continue
             print(f"[green]|INFO| Test opening file: {basename(file)}")
-            self.desktop.open(file)
+            self.desktop.open(file, log_out_mode=True)
             time.sleep(15)  # TODO
             self.check_error_on_screen()
             Image.make_screenshot(f"{join(self.report.dir, f'{self.version}_{self.host_name}_{basename(file)}.png')}")
@@ -125,7 +125,6 @@ class DesktopTest:
             DesktopData(
                 version=self.version,
                 tmp_dir=TestData.tmp_dir,
-                debug_mode=True,
                 custom_config_path=custom_config,
                 lic_file=license_file_path if license_file_path else TestData.lic_file_path,
                 cache_dir=TestData.cache_dir
