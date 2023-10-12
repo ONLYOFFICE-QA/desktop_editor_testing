@@ -47,8 +47,18 @@ class DesktopTests:
 
     def open_test(self):
         if self.update_from:
-            self.install_package(self.update_from, self.old_desktop, yum_installer=True)
-        self.install_package(self.version, self.desktop, yum_installer=True if self.update_from else False)
+            self.install_package(
+                self.update_from,
+                self.old_desktop,
+                yum_installer=True,
+                custom_installer='rpm -i' if HostInfo().name().lower() in ['opensuse'] else None
+            )
+        self.install_package(
+            self.version,
+            self.desktop,
+            yum_installer=True if self.update_from else False,
+            custom_installer='rpm -Uvh' if HostInfo().name().lower() in ['opensuse'] else None
+        )
         self.check_installed()
         self.check_correct_version()
         self.desktop.set_license()
@@ -106,7 +116,8 @@ class DesktopTests:
             version: str = None,
             desktop: DesktopEditor = None,
             yum_installer: bool = False,
-            apt_get_installer: bool = False
+            apt_get_installer: bool = False,
+            custom_installer: str = None
     ) -> None:
         version = version if version else self.version
         desktop = desktop if desktop else self.desktop
@@ -114,7 +125,11 @@ class DesktopTests:
             return print(f'[green]|INFO| Desktop version: {self.version} already installed[/]')
         try:
             desktop.package.get()
-            desktop.package.install(yum_installer=yum_installer, apt_get_installer=apt_get_installer)
+            desktop.package.install(
+                yum_installer=yum_installer,
+                apt_get_installer=apt_get_installer,
+                custom_installer=custom_installer
+            )
         except (UrlException, PackageException) as e:
             self._write_results('CANT_GET_PACKAGE')
             raise TestException(f"[red]|ERROR| Can't get the desktop package. Error: {e}")
