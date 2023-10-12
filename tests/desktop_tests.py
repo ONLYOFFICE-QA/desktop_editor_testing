@@ -51,9 +51,14 @@ class DesktopTests:
                 self.update_from,
                 self.old_desktop,
                 yum_installer=True,
-                custom_installer='rpm -Uvh' if HostInfo().name().lower() in ['opensuse'] else None
+                custom_installer='rpm -i' if HostInfo().name().lower() in ['opensuse'] else None
             )
-        self.install_package(self.version, self.desktop, yum_installer=True if self.update_from else False)
+        self.install_package(
+            self.version,
+            self.desktop,
+            yum_installer=True if self.update_from else False,
+            custom_installer='rpm -Uvh' if HostInfo().name().lower() in ['opensuse'] else None
+        )
         self.check_installed()
         self.check_correct_version()
         self.desktop.set_license()
