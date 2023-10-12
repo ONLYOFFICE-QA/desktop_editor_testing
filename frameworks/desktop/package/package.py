@@ -38,14 +38,21 @@ class Package:
             return int(getsize(self.path)) == int(headers['Content-Length'])
         return isfile(self.path)
 
-    def install(self, yum_installer: bool = False, apt_get_installer: bool = False) -> None:
+    def install(
+            self,
+            yum_installer: bool = False,
+            apt_get_installer: bool = False,
+            custom_installer: str = None
+    ) -> None:
         print(f"[green]|INFO| Installing Desktop version: {self.version}\nPackage: {self.name}")
         if isfile(self.path):
-            call(self._get_install_command(yum_installer, apt_get_installer), shell=True)
+            call(self._get_install_command(yum_installer, apt_get_installer, custom_installer), shell=True)
         else:
             raise PackageException(f"[red]|ERROR| Package not exists.")
 
-    def _get_install_command(self, yum_installer: bool, apt_get_installer: bool) -> str:
+    def _get_install_command(self, yum_installer: bool, apt_get_installer: bool, custom_installer: str = None) -> str:
+        if custom_installer:
+            return f"sudo {custom_installer} {self.path}"
         if self.path.lower().endswith('.deb'):
             self._unlock_dpkg()
             if apt_get_installer:
