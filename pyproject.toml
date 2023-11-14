@@ -7,7 +7,7 @@ readme = "README.md"
 packages = [{include = "desktop_editor_testing"}]
 
 [tool.poetry.dependencies]
-python = "^3.6"
+python = "^3.7"
 invoke = "*"
 rich = "*"
 psutil = "*"
