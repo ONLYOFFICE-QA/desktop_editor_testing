@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
+import time
 from os.path import join, getsize, basename, isdir, expanduser, isfile
 
 import tempfile
@@ -17,6 +18,7 @@ class Telegram:
         self._telegram_token = self._get_token()
         self._chat_id = self._get_chat_id()
         self.tmp_dir = tempfile.gettempdir()
+        self.proxies = self._get_proxies()
         FileUtils.create_dir(self.tmp_dir, stdout=False)
 
     @staticmethod
@@ -32,6 +34,21 @@ class Telegram:
         if isfile(path):
             return FileUtils.file_reader(path).strip()
         print(f"[cyan]|INFO|Telegram chat id not exists.")
+
+    @staticmethod
+    def _get_proxies():
+        proxies_config_path = join(expanduser('~'), '.telegram', 'proxy.json')
+        if isfile(proxies_config_path):
+            config = FileUtils.read_json(proxies_config_path)
+
+            for check_key in ['login', 'password', 'ip', 'port']:
+                if not config.get(check_key, None):
+                    return {}
+
+            proxy = f"http://{config['login']}:{config['password']}@{config['ip']}:{config['port']}"
+            return {'http': proxy, 'https': proxy}
+
+        return {}
 
     def send_message(self, message: str, out_msg=False) -> None:
         print(message) if out_msg else ...
@@ -82,14 +99,29 @@ class Telegram:
     def _prepare_caption(caption: str) -> str:
         return caption[:200]
 
-    def _request(self, url: str, data: dict, files: dict = None, tg_log: bool = True) -> None:
-        try:
-            response = requests.post(url, data=data, files=files)
-            if response.status_code != 200:
-                print(f"[bold red]|ERROR|Error when sending to telegram: {response.status_code}. data: {data}")
-                self.send_message(f"Error when sending to telegram: {response.status_code}") if tg_log else ...
-        except Exception as e:
-            self.send_message(f"|WARNING|Impossible to send: {data}. Error: {e}") if tg_log else ...
+    def _request(self, url: str, data: dict, files: dict = None, tg_log: bool = True, num_tries: int = 5) -> None:
+        while num_tries > 0:
+            try:
+                print(f"[red]|INFO| The message to Telegram will be sent via proxy") if self.proxies else ...
+                response = requests.post(url, data=data, files=files, proxies=self.proxies)
+
+                if response.status_code == 200:
+                    return
+
+                print(f"Error when sending to telegram: {response.json()}")
+
+                if response.status_code == 429:
+                    timeout = response.json().get('parameters', {}).get('retry_after', 10) + 1
+                    print(f"Retry after: {timeout}")
+                    time.sleep(timeout)
+
+            except Exception as e:
+                print(f"|WARNING| Impossible to send: {data}. Error: {e}\n timeout: 5 sec")
+                self.send_message(f"|WARNING| Impossible to send: {data}. Error: {e}") if tg_log else ...
+                time.sleep(5)
+
+            finally:
+                num_tries -= 1
 
     def _prepare_documents(self, doc_path: str) -> str:
         if getsize(doc_path) >= 50_000_000 or isdir(doc_path):
