@@ -1,142 +1,158 @@
 # -*- coding: utf-8 -*-
-import json
 import time
-from os.path import join, getsize, basename, isdir, expanduser, isfile
-
-import tempfile
-import requests
+from json import dumps
+from requests import post
+from tempfile import gettempdir
+from os.path import join, getsize, basename, isdir
 from rich import print
 
-
-from frameworks.decorators import singleton
 from frameworks.host_control import FileUtils
+from urllib3 import HTTPSConnectionPool
+from urllib3.exceptions import NewConnectionError
+
+from .Auth import Auth
+from .Proxy import Proxy, ProxyFile
 
 
-@singleton
 class Telegram:
-    def __init__(self):
-        self._telegram_token = self._get_token()
-        self._chat_id = self._get_chat_id()
-        self.tmp_dir = tempfile.gettempdir()
-        self.proxies = self._get_proxies()
+    __MAX_DOCUMENT_SIZE: int = 50_000_000
+    __MAX_CAPTCHA_LENGTH: int = 1000
+    __MAX_MESSAGE_LENGTH: int = 4096
+    __DEFAULT_PARSE_MOD: str = 'Markdown'
+    TG_HOST: str = "https://api.telegram.org"
+
+    def __init__(
+            self,
+            token: str = None,
+            chat_id: str = None,
+            tmp_dir: str = gettempdir(),
+            proxy: Proxy = None,
+            proxy_file:  str = None,
+            max_request_attempts: int = 10,
+            interval: int = 5
+    ):
+        self.interval = interval
+        self.max_request_attempts = max_request_attempts
+        self.auth = Auth(token=token, chat_id=chat_id)
+        self.tmp_dir = tmp_dir
+        self.proxies: dict = self._get_proxies(proxy, proxy_file)
         FileUtils.create_dir(self.tmp_dir, stdout=False)
 
-    @staticmethod
-    def _get_token():
-        path = join(expanduser('~'), '.telegram', 'token')
-        if isfile(path):
-            return FileUtils.file_reader(path).strip()
-        print(f"[cyan]|INFO|Telegram token not exists.")
-
-    @staticmethod
-    def _get_chat_id():
-        path = join(expanduser('~'), '.telegram', 'chat')
-        if isfile(path):
-            return FileUtils.file_reader(path).strip()
-        print(f"[cyan]|INFO|Telegram chat id not exists.")
-
-    @staticmethod
-    def _get_proxies():
-        proxies_config_path = join(expanduser('~'), '.telegram', 'proxy.json')
-        if isfile(proxies_config_path):
-            config = FileUtils.read_json(proxies_config_path)
-
-            for check_key in ['login', 'password', 'ip', 'port']:
-                if not config.get(check_key, None):
-                    return {}
-
-            proxy = f"http://{config['login']}:{config['password']}@{config['ip']}:{config['port']}"
-            return {'http': proxy, 'https': proxy}
-
-        return {}
-
-    def send_message(self, message: str, out_msg=False) -> None:
+    def send_message(self, message: str, out_msg: bool = False, parse_mode: str = None) -> None:
+        _parse_mod = parse_mode if parse_mode else self.__DEFAULT_PARSE_MOD
         print(message) if out_msg else ...
-        if self._access:
-            if len(message) > 4096:
-                document = self._make_massage_doc(message=message)
-                self.send_document(document, caption=self._prepare_caption(message))
-                return FileUtils.delete(document)
-            self._request(
-                f"https://api.telegram.org/bot{self._telegram_token}/sendMessage",
-                data={"chat_id": self._chat_id, "text": message, "parse_mode": "Markdown"},
-                tg_log=False
-            )
 
-    def send_document(self, document_path: str, caption: str = '') -> None:
-        if self._access:
-            self._request(
-                f"https://api.telegram.org/bot{self._telegram_token}/sendDocument",
-                data={"chat_id": self._chat_id, "caption": self._prepare_caption(caption), "parse_mode": "Markdown"},
-                files={"document": open(self._prepare_documents(document_path), 'rb')}
-            )
+        if len(message) > self.__MAX_MESSAGE_LENGTH:
+            document = self._make_massage_doc(message=message)
+            self.send_document(document, caption=message)
+            return FileUtils.delete(document, stdout=False)
 
-    def send_media_group(self, document_paths: list, caption: str = None, media_type: str = 'document') -> None:
+        message_data = { "chat_id": self.auth.chat_id, "text": message, "parse_mode": _parse_mod }
+        self._request('sendMessage', data=message_data, tg_log=False)
+
+    def send_document(self, document_path: str, caption: str = '', parse_mode: str = None) -> None:
+        _parse_mod = parse_mode if parse_mode else self.__DEFAULT_PARSE_MOD
+
+        _data = { "chat_id": self.auth.chat_id, "caption": self._prepare_caption(caption), "parse_mode": _parse_mod }
+        _file = { "document": open(self._prepare_documents(document_path), 'rb') }
+
+        self._request('sendDocument', data=_data, files=_file)
+
+    def send_media_group(
+            self,
+            document_paths: list,
+            caption: str = None,
+            media_type: str = 'document',
+            parse_mode: str = None
+    ) -> None:
         """
+        :param parse_mode: HTML, Markdown, MarkdownV2
         :param document_paths:
         :param caption:
         :param media_type: types: 'photo', 'video', 'audio', 'document', 'voice', 'animation'
         :return:
         """
-        if self._access:
-            if not document_paths:
-                return self.send_message(caption if caption else 'No files to send.', out_msg=True)
-            if caption and len(caption)  > 200:
-                document_paths.append(self._make_massage_doc(caption, 'caption.txt'))
-            files, media = {}, []
-            for doc_path in document_paths:
-                files[basename(doc_path)] = open(self._prepare_documents(doc_path), 'rb')
-                media.append(dict(type=media_type, media=f'attach://{basename(doc_path)}'))
-            media[-1]['caption'] = self._prepare_caption(caption) if caption is not None else ''
-            media[-1]['parse_mode'] = "Markdown"
-            self._request(
-                f'https://api.telegram.org/bot{self._telegram_token}/sendMediaGroup',
-                data={'chat_id': self._chat_id, 'media': json.dumps(media)},
-                files=files
-            )
+        _parse_mod = parse_mode if parse_mode else self.__DEFAULT_PARSE_MOD
+        files, media = {}, []
+
+        if not document_paths:
+            return self.send_message(f"No files to send. {caption if caption else ''}", out_msg=True)
+
+        if caption and len(caption) > self.__MAX_CAPTCHA_LENGTH:
+            document_paths.append(self._make_massage_doc(caption, 'caption.txt'))
+
+        for doc_path in document_paths:
+            files[basename(doc_path)] = open(self._prepare_documents(doc_path), 'rb')
+            media.append(dict(type=media_type, media=f'attach://{basename(doc_path)}'))
+
+        media[-1]['caption'] = self._prepare_caption(caption) if caption is not None else ''
+        media[-1]['parse_mode'] = _parse_mod
+
+        media_group_data = { 'chat_id': self.auth.chat_id, 'media': dumps(media) }
+
+        self._request('sendMediaGroup', data=media_group_data, files=files)
 
     @staticmethod
-    def _prepare_caption(caption: str) -> str:
-        return caption[:200]
+    def escape_special_characters(text: str, special_characters: str) -> str:
+        escaped_string = ""
 
-    def _request(self, url: str, data: dict, files: dict = None, tg_log: bool = True, num_tries: int = 5) -> None:
-        while num_tries > 0:
-            try:
-                print(f"[red]|INFO| The message to Telegram will be sent via proxy") if self.proxies else ...
-                response = requests.post(url, data=data, files=files, proxies=self.proxies)
+        for char in text:
+            if char in special_characters:
+                escaped_string += '\\' + char
+            else:
+                escaped_string += char
 
-                if response.status_code == 200:
-                    return
+        return escaped_string
 
-                print(f"Error when sending to telegram: {response.json()}")
+    def _request(self, mode: str, data: dict, files: dict = None, tg_log: bool = True) -> None:
+        _max_attempts = self.max_request_attempts
+        if self.auth.token and self.auth.chat_id:
+            while _max_attempts > 0:
+                try:
+                    print(f"[red]|INFO| The message to Telegram will be sent via proxy") if self.proxies else ...
+                    response = post(self._get_url(mode), data=data, files=files, proxies=self.proxies)
 
-                if response.status_code == 429:
-                    timeout = response.json().get('parameters', {}).get('retry_after', 10) + 1
-                    print(f"Retry after: {timeout}")
-                    time.sleep(timeout)
+                    if response.status_code == 200:
+                        return
 
-            except Exception as e:
-                print(f"|WARNING| Impossible to send: {data}. Error: {e}\n timeout: 5 sec")
-                self.send_message(f"|WARNING| Impossible to send: {data}. Error: {e}") if tg_log else ...
-                time.sleep(5)
+                    print(f"Error when sending to telegram: {response.json()}")
 
-            finally:
-                num_tries -= 1
+                    if response.status_code == 429:
+                        timeout = response.json().get('parameters', {}).get('retry_after', 10) + 1
+                        print(f"Retry after: {timeout}")
+                        time.sleep(timeout)
+                    else:
+                        time.sleep(self.interval)
+
+                except (HTTPSConnectionPool, NewConnectionError) as e:
+                    print(f"|WARNING| Impossible to send: {data}. Error: {e}\n timeout: 20 sec")
+                    self.send_message(f"|WARNING| Impossible to send: {data}. Error: {e}") if tg_log else ...
+                    time.sleep(self.interval)
+
+                finally:
+                    _max_attempts -= 1
 
     def _prepare_documents(self, doc_path: str) -> str:
-        if getsize(doc_path) >= 50_000_000 or isdir(doc_path):
-            FileUtils.compress_files(doc_path, join(self.tmp_dir, f'{basename(doc_path)}.zip'))
-            return join(self.tmp_dir, f'{basename(doc_path)}.zip')
-        return doc_path
+        if not isdir(doc_path) or getsize(doc_path) <= self.__MAX_DOCUMENT_SIZE:
+            return doc_path
 
-    def _make_massage_doc(self, message: str, name: str = 'report.txt') -> str:
+        archive_path = join(self.tmp_dir, f'{basename(doc_path)}.zip')
+        FileUtils.compress_files(doc_path, archive_path)
+        return archive_path
+
+    def _prepare_caption(self, caption: str) -> str:
+        return caption[:self.__MAX_CAPTCHA_LENGTH]
+
+    def _make_massage_doc(self, message: str, name: str = 'message.txt') -> str:
         doc_path = join(self.tmp_dir, name)
-        with open(doc_path, "w") as file:
-            file.write(message)
+        FileUtils.file_writer(doc_path, message)
         return doc_path
 
-    @property
-    def _access(self) -> bool:
-        if self._telegram_token and self._chat_id:
-            return True
-        return False
+    @staticmethod
+    def _get_proxies(proxy: Proxy = None, proxy_file: "True | str" = None) -> dict:
+        if isinstance(proxy, Proxy):
+            return proxy.configs
+        return ProxyFile(proxy_file).get_configs()
+
+    def _get_url(self, mode: str) -> str:
+        return f"{self.TG_HOST}/bot{self.auth.token}/{mode}"
