@@ -25,7 +25,7 @@ def install_desktop(c, version=None, config=None, license=None):
         custom_config=config if config else None,
         license_file_path=license
     )
-    test.install_package()
+    test.install_package(test.version, test.desktop)
     test.check_installed()
     test.check_correct_version()
     test.desktop.set_license()

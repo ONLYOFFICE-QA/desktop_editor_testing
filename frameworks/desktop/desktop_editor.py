@@ -53,17 +53,12 @@ class DesktopEditor:
                     f"[red]|ERROR| The waiting time {timeout} seconds for the editor to open has expired."
                 )
 
-    def version(self) -> "str | None":
+    def get_version(self) -> "str | None":
         version = re.findall(
             r"\d+\.\d+\.\d+\.\d+",
             FileUtils.output_cmd(f'{self._generate_running_command()} --version')
         )
         return version[0] if version else None
-
-    def close(self):
-        # Todo
-        # call('killall DesktopEditors', shell=True) -> segmentation fault in stdout
-        ...
 
     def _read_log(self, wait_msg: str, stdout_process: Popen) -> str:
         if 'stdout' in self.log_out_cmd:

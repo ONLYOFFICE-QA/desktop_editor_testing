@@ -5,7 +5,6 @@ from os.path import join, basename
 from subprocess import Popen
 
 from rich import print
-from rich.console import Console
 from pyvirtualdisplay import Display
 
 from frameworks.desktop import DesktopEditor, DesktopData, DesktopException, UrlException, PackageException
@@ -13,8 +12,6 @@ from frameworks.test_data import TestData
 from frameworks.host_control import FileUtils, HostInfo
 from frameworks.image_handler import Image
 from tests.tools.desktop_report import DesktopReport
-
-console = Console()
 
 
 class TestException(Exception): ...
@@ -65,7 +62,6 @@ class DesktopTests:
         self.check_open_desktop(self.desktop.open(log_out_mode=True), '[DesktopEditors]: start page loaded')
         self.check_open_files(self.good_files)
         self._write_results(f'Passed')
-        self.desktop.close()
         self.display.stop() if self.virtual_display else ...
 
     def check_open_files(self, files_dir: str):
@@ -90,7 +86,7 @@ class DesktopTests:
             raise TestException("[red]|ERROR| Can't open desktop editor")
 
     def check_installed(self):
-        installed_version = self.desktop.version()
+        installed_version = self.desktop.get_version()
         if self.version != installed_version:
             self._write_results('NOT_INSTALLED')
             raise TestException(
@@ -99,7 +95,7 @@ class DesktopTests:
             )
 
     def check_correct_version(self):
-        version = self.desktop.version()
+        version = self.desktop.get_version()
         if len([i for i in version.split('.') if i]) != 4:
             self._write_results('INCORRECT_VERSION')
             raise TestException(f"[red]|ERROR| The version is not correct: {version}")
@@ -113,15 +109,13 @@ class DesktopTests:
 
     def install_package(
             self,
-            version: str = None,
-            desktop: DesktopEditor = None,
+            version: str,
+            desktop: DesktopEditor,
             yum_installer: bool = False,
             apt_get_installer: bool = False,
             custom_installer: str = None
     ) -> None:
-        version = version if version else self.version
-        desktop = desktop if desktop else self.desktop
-        if version == self.desktop.version():
+        if version == desktop.get_version():
             return print(f'[green]|INFO| Desktop version: {self.version} already installed[/]')
         try:
             desktop.package.get()
