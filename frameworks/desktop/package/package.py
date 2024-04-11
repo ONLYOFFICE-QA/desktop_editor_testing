@@ -1,6 +1,6 @@
 from subprocess import call
-from rich import print
 from os.path import join, isfile, getsize
+from rich import print
 
 from frameworks.host_control import FileUtils, HostInfo
 from frameworks.decorators.decorators import highlighter
@@ -26,16 +26,16 @@ class Package:
         if self.exists(headers):
             print(f"[green]|INFO| Package {self.name} already exists. Path: {self.path}")
         else:
-            self.download() if headers else print(f"[red]|WARNING| Package does not exist on aws")
+            self.download() if headers else print("[red]|WARNING| Package does not exist on aws")
 
     @highlighter(color='green')
     def download(self) -> None:
         print(f"[green]|INFO| Downloading Desktop package\nVersion: {self.version}\nOS: {self.os}\nURL: {self.url}")
         FileUtils.download_file(self.url, self.download_dir)
 
-    def exists(self, headers: "dict | None" = None) -> bool:
+    def exists(self, headers: dict = None) -> bool:
         if headers and isfile(self.path):
-            return int(getsize(self.path)) == int(headers['Content-Length'])
+            return getsize(self.path) == int(headers.get('Content-Length', 0))
         return isfile(self.path)
 
     def install(
@@ -48,27 +48,34 @@ class Package:
         if isfile(self.path):
             call(self._get_install_command(yum_installer, apt_get_installer, custom_installer), shell=True)
         else:
-            raise PackageException(f"[red]|ERROR| Package not exists.")
+            raise PackageException("[red]|ERROR| Package not exists.")
 
-    def _get_install_command(self, yum_installer: bool, apt_get_installer: bool, custom_installer: str = None) -> str:
+    def _get_install_command(
+            self,
+            yum_installer: bool = False,
+            apt_get_installer: bool = False,
+            custom_installer: str = None
+    ) -> str:
         if custom_installer:
             return f"sudo {custom_installer} {self.path}"
+
         if self.path.lower().endswith('.deb'):
             self._unlock_dpkg()
             if apt_get_installer:
                 return f"sudo apt-get install -y {self.path}"
             return f"sudo dpkg -i {self.path}"
-        elif self.path.lower().endswith('.rpm'):
+
+        if self.path.lower().endswith('.rpm'):
             if yum_installer:
                 return f"sudo yum install -y {self.path}"
             return f"sudo rpm -i {self.path}"
-        else:
-            raise PackageException(
-                f"[red]|ERROR| Unable to generate a command to install the desktop package.\n"
-                f"os: {HostInfo().name().lower()}\n"
-                f"version: {HostInfo().version}\n"
-                f"package path: {self.path}"
-            )
+
+        raise PackageException(
+            f"[red]|ERROR| Unable to generate a command to install the desktop package.\n"
+            f"os: {self.os.lower()}\n"
+            f"version: {HostInfo().version}\n"
+            f"package path: {self.path}"
+        )
 
     @staticmethod
     def _unlock_dpkg() -> None:
