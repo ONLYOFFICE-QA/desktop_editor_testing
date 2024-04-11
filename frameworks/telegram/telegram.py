@@ -73,7 +73,6 @@ class Telegram:
         :return:
         """
         _parse_mod = parse_mode if parse_mode else self.__DEFAULT_PARSE_MOD
-        files, media = {}, []
 
         if not document_paths:
             return self.send_message(f"No files to send. {caption if caption else ''}", out_msg=True)
@@ -81,16 +80,23 @@ class Telegram:
         if caption and len(caption) > self.__MAX_CAPTCHA_LENGTH:
             document_paths.append(self._make_massage_doc(caption, 'caption.txt'))
 
-        for doc_path in document_paths:
-            files[basename(doc_path)] = open(self._prepare_documents(doc_path), 'rb')
-            media.append(dict(type=media_type, media=f'attach://{basename(doc_path)}'))
+        _max_attempts = self.max_request_attempts
 
-        media[-1]['caption'] = self._prepare_caption(caption) if caption is not None else ''
-        media[-1]['parse_mode'] = _parse_mod
+        while _max_attempts > 0:
+            files, media = {}, []
+            for doc_path in document_paths:
+                files[basename(doc_path)] = open(self._prepare_documents(doc_path), 'rb')
+                media.append(dict(type=media_type, media=f'attach://{basename(doc_path)}'))
 
-        media_group_data = { 'chat_id': self.auth.chat_id, 'media': dumps(media) }
+            media[-1]['caption'] = self._prepare_caption(caption) if caption is not None else ''
+            media[-1]['parse_mode'] = _parse_mod
 
-        self._request('sendMediaGroup', data=media_group_data, files=files)
+            media_group_data = {'chat_id': self.auth.chat_id, 'media': dumps(media)}
+
+            if self._request('sendMediaGroup', data=media_group_data, files=files):
+                break
+
+            _max_attempts -= 1
 
     @staticmethod
     def escape_special_characters(text: str, special_characters: str) -> str:
@@ -104,7 +110,7 @@ class Telegram:
 
         return escaped_string
 
-    def _request(self, mode: str, data: dict, files: dict = None, tg_log: bool = True) -> None:
+    def _request(self, mode: str, data: dict, files: dict = None, tg_log: bool = True) -> bool:
         _max_attempts = self.max_request_attempts
         if self.auth.token and self.auth.chat_id:
             while _max_attempts > 0:
@@ -113,14 +119,19 @@ class Telegram:
                     response = post(self._get_url(mode), data=data, files=files, proxies=self.proxies)
 
                     if response.status_code == 200:
-                        return
+                        return True
 
                     print(f"Error when sending to telegram: {response.json()}")
 
                     if response.status_code == 429:
-                        timeout = response.json().get('parameters', {}).get('retry_after', 10) + 1
+                        timeout = response.json().get('parameters', {}).get('retry_after', 10) + 2
                         print(f"Retry after: {timeout}")
                         time.sleep(timeout)
+
+                    elif response.status_code == 400:
+                        if response.json().get('description') == 'Bad Request: file must be non-empty':
+                            return False
+
                     else:
                         time.sleep(self.interval)
 
