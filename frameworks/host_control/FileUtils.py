@@ -4,7 +4,7 @@ import json
 import string
 import zipfile
 from os import listdir, makedirs, scandir, remove, walk
-from os.path import exists, isfile, isdir, join, getctime, basename, getsize, relpath
+from os.path import exists, isfile, isdir, join, getctime, basename, getsize, relpath, dirname
 from random import randint, choice
 from shutil import move, copytree, copyfile, rmtree
 from subprocess import Popen, PIPE, getoutput
@@ -25,8 +25,7 @@ class FileUtils:
 
     @staticmethod
     def write_json(path_to, data, mode='w'):
-        if not exists(path_to):
-            return print(f"|WARNING| The path to json file_name does not exist: {path_to}")
+        FileUtils.create_dir(dirname(path_to), stdout=False)
         with open(path_to, mode) as file:
             json.dump(data, file, indent=2)
 
