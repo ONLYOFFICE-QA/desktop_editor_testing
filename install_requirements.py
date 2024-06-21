@@ -26,7 +26,11 @@ def create_requirements():
     with open(poetry_requirements) as t:
         for package, version in tomlkit.parse(t.read())['tool']['poetry']['dependencies'].items():
             if package.lower() not in exceptions:
-                if int(platform.python_version().rsplit(".", 1)[0].replace('.', '')) < 39:
+                if isinstance(version, dict):
+                    if 'git' in version:
+                        write(f"git+{version.get('git')}@{version.get('branch')}", 'a')
+                        continue
+                elif int(platform.python_version().rsplit(".", 1)[0].replace('.', '')) < 39:
                     version = old_system_package_version(package)
                 else:
                     version = re.sub(r'[*^]', '', version)
@@ -42,9 +46,9 @@ def install_tomlkit():
     sb.call('pip install tomlkit==0.11.6', shell=True)
 
 if __name__ == "__main__":
-    install_tomlkit()
+    # install_tomlkit()
     import tomlkit
-    upgrade_pip()
+    # upgrade_pip()
     write('# -*- coding: utf-8 -*-\n', 'w')
     create_requirements()
-    install_requirements()
+    # install_requirements()

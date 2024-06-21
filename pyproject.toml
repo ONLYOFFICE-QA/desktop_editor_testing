@@ -18,6 +18,8 @@ pyvirtualdisplay = "*"
 opencv-python = "*"
 urllib3 = '*'
 pillow = '*'
+telegram = { git = "https://github.com/l8556/TelegramApi.git", branch = "master" }
+
 
 
 [build-system]
