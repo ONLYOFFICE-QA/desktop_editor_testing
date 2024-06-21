@@ -5,6 +5,15 @@ from .ProxyChecker import ProxyChecker
 
 
 class Proxy:
+    """
+    Represents a proxy configuration with login credentials.
+
+    :param login: Username for proxy authentication.
+    :param password: Password for proxy authentication.
+    :param ip: IP address of the proxy server.
+    :param port: Port number of the proxy server.
+    """
+
     def __init__(self, login: str, password: str, ip: str, port: str):
         self.login = login
         self.password = password
@@ -18,5 +27,6 @@ class Proxy:
 
         if ProxyChecker.check(proxies):
             return proxies
+
         print(f"[red]|ERROR| Unable to access the proxy server. Check configs.")
         return {}
