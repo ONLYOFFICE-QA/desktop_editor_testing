@@ -8,7 +8,6 @@ packages = [{include = "desktop_editor_testing"}]
 
 [tool.poetry.dependencies]
 python = "^3.7"
-numpy = "^1.26.4"
 invoke = "*"
 rich = "*"
 psutil = "*"
