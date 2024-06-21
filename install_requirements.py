@@ -46,9 +46,9 @@ def install_tomlkit():
     sb.call('pip install tomlkit==0.11.6', shell=True)
 
 if __name__ == "__main__":
-    # install_tomlkit()
+    install_tomlkit()
     import tomlkit
-    # upgrade_pip()
+    upgrade_pip()
     write('# -*- coding: utf-8 -*-\n', 'w')
     create_requirements()
-    # install_requirements()
+    install_requirements()
