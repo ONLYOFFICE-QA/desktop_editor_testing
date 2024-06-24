@@ -11,7 +11,6 @@ Python36 = {
     "opencv-python": "4.3.0.38",
     "rich": "12.6.0"
 }
-
 def write(text, mode='w'):
     with open(requirements_file, mode) as f:
         f.write(text)
@@ -26,7 +25,11 @@ def create_requirements():
     with open(poetry_requirements) as t:
         for package, version in tomlkit.parse(t.read())['tool']['poetry']['dependencies'].items():
             if package.lower() not in exceptions:
-                if int(platform.python_version().rsplit(".", 1)[0].replace('.', '')) < 39:
+                if isinstance(version, dict):
+                    if 'git' in version:
+                        write(f"git+{version.get('git')}@{version.get('branch')}", 'a')
+                    continue
+                elif int(platform.python_version().rsplit(".", 1)[0].replace('.', '')) < 39:
                     version = old_system_package_version(package)
                 else:
                     version = re.sub(r'[*^]', '', version)

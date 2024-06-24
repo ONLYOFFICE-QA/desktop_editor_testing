@@ -31,7 +31,7 @@ class Package:
     @highlighter(color='green')
     def download(self) -> None:
         print(f"[green]|INFO| Downloading Desktop package\nVersion: {self.version}\nOS: {self.os}\nURL: {self.url}")
-        FileUtils.download_file(self.url, self.download_dir)
+        FileUtils.download(self.url, self.download_dir)
 
     def exists(self, headers: dict = None) -> bool:
         if headers and isfile(self.path):
