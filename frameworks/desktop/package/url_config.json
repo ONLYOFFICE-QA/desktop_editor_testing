@@ -5,7 +5,8 @@
   "os_family": {
     "debian": ["debian", "ubuntu", "linuxmint", "pop"],
     "rhel": ["centos", "redos", "altlinux", "fedora"],
-    "suse": ["opensuse"]
+    "suse": ["opensuse"],
+    "inno": ["windows"]
   },
   "package_name": {
     "debian": {
@@ -19,6 +20,9 @@
       "suse": {
       "package_cef107": "onlyoffice-desktopeditors-[version]~cef107.suse12.x86_64.rpm",
       "package": "onlyoffice-desktopeditors-[version].suse12.x86_64.rpm"
+    },
+    "inno": {
+      "package": "ONLYOFFICE-DesktopEditors-[version]-x64.exe"
     }
   }
 }

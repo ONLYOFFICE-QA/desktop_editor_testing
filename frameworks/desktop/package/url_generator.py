@@ -44,7 +44,7 @@ class UrlGenerator:
 
     @property
     def _version_for_url(self):
-        if self._os == 'windows':
+        if HostInfo().os == 'windows':
             return self.version.version
         return f"{self.version.major}.{self.version.minor}-{self.version.build}"
 
