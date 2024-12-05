@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 import json
 from os import makedirs, walk
-from os.path import isfile, isdir, join, basename, getsize
+from os.path import isfile, isdir, join, basename, getsize, exists
+from shutil import copyfile
 from subprocess import getoutput, Popen, PIPE
 from codecs import open as codecs_open
 
@@ -52,6 +53,20 @@ class FileUtils:
         print(f"[bold red]|WARNING| Can't get headers\nURL:{url}\nResponse: {status.status_code}") if stderr else None
         return None
 
+
+    @staticmethod
+    def copy(
+            path_from: str,
+            path_to: str,
+            stderr: bool = True,
+    ) -> None:
+        if not exists(path_from):
+            return print(f"[red]|WARNING| Path not exist: {path_from}") if stderr else None
+
+        if isfile(path_from):
+            copyfile(path_from, path_to)
+        else:
+            return print(f"[red] Cant copy dir: {path_from}")
 
     @staticmethod
     def download(
