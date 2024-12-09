@@ -138,10 +138,12 @@ class DesktopTests:
         )
 
     def _create_display(self, visible: bool = False, size: tuple = (1920, 1080)):
-        if self.virtual_display:
+        if self.virtual_display and HostInfo().os != 'windows':
             print("[green]|INFO| The test is running on the virtual display")
             self.display = Display(visible=visible, size=size)
-            self.display.start()
+            return self.display.start()
+
+        self.virtual_display = False
 
     @staticmethod
     def _create_desktop(version: str, custom_config: str, license_file_path: str):
