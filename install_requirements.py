@@ -3,6 +3,8 @@ import platform
 import re
 import subprocess as sb
 
+from frameworks.host_control import HostInfo
+
 requirements_file = 'requirements.txt'
 poetry_requirements = 'pyproject.toml'
 exceptions = ['python']
@@ -28,11 +30,17 @@ def create_requirements():
                 if isinstance(version, dict):
                     if 'git' in version:
                         write(f"git+{version.get('git')}@{version.get('branch')}", 'a')
-                    continue
+                        continue
+                    if package.lower() == 'pywin32' and HostInfo().os == 'windows':
+                        version = version.get('version')
                 elif int(platform.python_version().rsplit(".", 1)[0].replace('.', '')) < 39:
                     version = old_system_package_version(package)
                 else:
                     version = re.sub(r'[*^]', '', version)
+
+                if package.lower() == 'pywin32' and HostInfo().os != 'windows':
+                    continue
+
                 write(f"{package}{('==' + version) if version else ''}\n", 'a')
 
 def upgrade_pip():

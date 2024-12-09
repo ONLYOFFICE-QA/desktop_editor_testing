@@ -17,6 +17,7 @@ pyvirtualdisplay = "*"
 opencv-python = "*"
 urllib3 = '*'
 pillow = '*'
+pywin32 = { version = "*", markers = "sys_platform == 'win32'" }
 
 
 [build-system]
