@@ -30,7 +30,7 @@ def get_dependency_version(package, version_info, is_old_python):
         if "git" in version_info:
             return f"git+{version_info['git']}@{version_info.get('branch', 'main')}"
         if package.lower() == "pywin32":
-            return version_info.get("version", "")
+            return re.sub(r"[*^]", "", version_info.get("version", ""))
     elif is_old_python:
         return get_version_for_old_python(package)
     else:
