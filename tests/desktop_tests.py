@@ -166,8 +166,10 @@ class DesktopTests:
 
     def _close_warning_window(self) -> None:
         window = Window()
+
         for info in self.warning_window_info.values():
             window_hwnd = window.get_hwnd(info.get('class_name', ''), info.get('window_text', ''))
+
             if not window_hwnd:
                 continue
 
