@@ -165,15 +165,17 @@ class DesktopTests:
         return join(TestData.reports_dir, title, self.version, f"{self.version}_{title}_report.csv")
 
     def _close_warning_window(self) -> None:
-        if HostInfo().os != 'windows':
-            return
-
         window = Window()
         for info in self.warning_window_info.values():
             window_hwnd = window.get_hwnd(info.get('class_name', ''), info.get('window_text', ''))
             if not window_hwnd:
                 continue
 
-            button_hwnd = window.get_child_window_hwnd(window_hwnd, info.get('Button', ''), info.get('button_text', ''))
+            button_hwnd = window.get_child_window_hwnd(
+                window_hwnd,
+                info.get('button_class_name', ''),
+                info.get('button_text', '')
+            )
+
             if button_hwnd:
                 window.click_on_button(button_hwnd)

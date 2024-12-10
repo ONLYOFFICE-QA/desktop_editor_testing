@@ -14,28 +14,30 @@ class WindowsWindow(Window):
 
     @staticmethod
     def get_hwnd(class_name: str, text: str) -> Optional[int]:
+        data = []
 
-        def enum_windows_callback(hwnd: int):
+        def enum_windows_callback(hwnd: int, data: list):
             if win32gui.IsWindowVisible(hwnd):
                 if (
                         class_name.strip() == win32gui.GetClassName(hwnd).strip()
                         and text.strip() == win32gui.GetWindowText(hwnd).strip()
                 ):
-                    return hwnd
+                    data.append(hwnd)
 
-        win32gui.EnumWindows(enum_windows_callback)
-        return None
+        win32gui.EnumWindows(enum_windows_callback, data)
+        return data[0] if data else None
 
     @staticmethod
     def get_child_window_hwnd(window_hwnd: int, child_window_title: str, child_window_text: str) -> Optional[int]:
+        data = []
 
-        def find_button(hwnd):
+        def find_button(hwnd, data: list):
             cls_name, text = win32gui.GetClassName(hwnd), win32gui.GetWindowText(hwnd)
             if cls_name in child_window_title and child_window_text in text:
-                return hwnd
+                data.append(hwnd)
 
-        win32gui.EnumChildWindows(window_hwnd, find_button)
-        return None
+        win32gui.EnumChildWindows(window_hwnd, find_button, data)
+        return data[0] if data else None
 
     @staticmethod
     def click_on_button(button_hwnd: int):
