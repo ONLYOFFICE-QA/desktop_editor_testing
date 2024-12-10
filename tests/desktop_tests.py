@@ -9,7 +9,7 @@ from pyvirtualdisplay import Display
 
 from frameworks.desktop import DesktopEditor, DesktopData, DesktopException, UrlException, PackageException
 from frameworks.test_data import TestData
-from frameworks.host_control import FileUtils, HostInfo
+from frameworks.host_control import FileUtils, HostInfo, Window
 from frameworks.image_handler import Image
 from tests.tools.desktop_report import DesktopReport
 
@@ -18,6 +18,8 @@ class TestException(Exception): ...
 
 
 class DesktopTests:
+    warning_window_info = FileUtils.read_json(TestData.warning_window_info)
+
     def __init__(
             self,
             version: str,
@@ -101,6 +103,7 @@ class DesktopTests:
             raise TestException(f"[red]|ERROR| The version is not correct: {version}")
 
     def check_error_on_screen(self):
+        self._close_warning_window()
         for error_img in FileUtils.get_paths(join(self.img_dir, 'errors')):
             if Image.is_present(error_img):
                 Image.make_screenshot(join(self.report.dir, f'{self.version}_{self.host_name}_error_screen.png'))
@@ -160,3 +163,17 @@ class DesktopTests:
     def _report_path(self):
         title = self.config.get('title', 'Undefined_title')
         return join(TestData.reports_dir, title, self.version, f"{self.version}_{title}_report.csv")
+
+    def _close_warning_window(self) -> None:
+        if HostInfo().os != 'windows':
+            return
+
+        window = Window()
+        for info in self.warning_window_info.values():
+            window_hwnd = window.get_hwnd(info.get('class_name', ''), info.get('window_text', ''))
+            if not window_hwnd:
+                continue
+
+            button_hwnd = window.get_child_window_hwnd(window_hwnd, info.get('Button', ''), info.get('button_text', ''))
+            if button_hwnd:
+                window.click_on_button(button_hwnd)
