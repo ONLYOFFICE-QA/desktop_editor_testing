@@ -9,7 +9,7 @@ from pyvirtualdisplay import Display
 
 from frameworks.desktop import DesktopEditor, DesktopData, DesktopException, UrlException, PackageException
 from frameworks.test_data import TestData
-from frameworks.host_control import FileUtils, HostInfo
+from frameworks.host_control import FileUtils, HostInfo, Window
 from frameworks.image_handler import Image
 from tests.tools.desktop_report import DesktopReport
 
@@ -18,6 +18,8 @@ class TestException(Exception): ...
 
 
 class DesktopTests:
+    warning_window_info = FileUtils.read_json(TestData.warning_window_info)
+
     def __init__(
             self,
             version: str,
@@ -40,6 +42,7 @@ class DesktopTests:
         self.good_files = TestData.good_files_dir
         self.desktop = self._create_desktop(self.version, custom_config, license_file_path)
         self.old_desktop = self._create_desktop(update_from, custom_config, license_file_path) if update_from else None
+        self.error_images = [Image.read(img_path=path) for path in FileUtils.get_paths(join(self.img_dir, 'errors'))]
         FileUtils.create_dir(self.report.dir, stdout=False)
 
     def open_test(self):
@@ -101,7 +104,8 @@ class DesktopTests:
             raise TestException(f"[red]|ERROR| The version is not correct: {version}")
 
     def check_error_on_screen(self):
-        for error_img in FileUtils.get_paths(join(self.img_dir, 'errors')):
+        self._close_warning_window()
+        for error_img in self.error_images:
             if Image.is_present(error_img):
                 Image.make_screenshot(join(self.report.dir, f'{self.version}_{self.host_name}_error_screen.png'))
                 self._write_results('ERROR')
@@ -138,10 +142,12 @@ class DesktopTests:
         )
 
     def _create_display(self, visible: bool = False, size: tuple = (1920, 1080)):
-        if self.virtual_display:
+        if self.virtual_display and HostInfo().os != 'windows':
             print("[green]|INFO| The test is running on the virtual display")
             self.display = Display(visible=visible, size=size)
-            self.display.start()
+            return self.display.start()
+
+        self.virtual_display = False
 
     @staticmethod
     def _create_desktop(version: str, custom_config: str, license_file_path: str):
@@ -158,3 +164,21 @@ class DesktopTests:
     def _report_path(self):
         title = self.config.get('title', 'Undefined_title')
         return join(TestData.reports_dir, title, self.version, f"{self.version}_{title}_report.csv")
+
+    def _close_warning_window(self) -> None:
+        window = Window()
+
+        for info in self.warning_window_info.values():
+            window_hwnd = window.get_hwnd(info.get('class_name', ''), info.get('window_text', ''))
+
+            if not window_hwnd:
+                continue
+
+            button_hwnd = window.get_child_window_hwnd(
+                window_hwnd,
+                info.get('button_class_name', ''),
+                info.get('button_text', '')
+            )
+
+            if button_hwnd:
+                window.click_on_button(button_hwnd)

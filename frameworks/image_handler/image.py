@@ -29,9 +29,13 @@ class Image:
         return None
 
     @staticmethod
-    def is_present(template_path: str, window_coordinates: tuple = None, threshold: "int | float" = 0.8) -> bool:
+    def is_present(
+            template: "str | cv2.imread",
+            window_coordinates: tuple = None,
+            threshold: "int | float" = 0.8
+    ) -> bool:
         window = cv2.cvtColor(Image.grab_coordinate(window_coordinates), cv2.COLOR_BGR2GRAY)
-        template = cv2.cvtColor(cv2.imread(template_path), cv2.COLOR_BGR2GRAY)
+        template = cv2.cvtColor(cv2.imread(template) if isinstance(template, str) else template, cv2.COLOR_BGR2GRAY)
         _, max_val, _, _ = cv2.minMaxLoc(cv2.matchTemplate(window, template, cv2.TM_CCOEFF_NORMED))
         return True if max_val >= threshold else False
 

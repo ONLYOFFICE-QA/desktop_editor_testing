@@ -56,6 +56,9 @@ class Package:
             apt_get_installer: bool = False,
             custom_installer: str = None
     ) -> str:
+        if self.path.lower().endswith('.exe'):
+            return f'powershell.exe Start-Process {self.path} -ArgumentList "/silent", "/norestart" -Wait'
+
         if custom_installer:
             return f"sudo {custom_installer} {self.path}"
 

@@ -22,7 +22,7 @@ class DesktopEditor:
         self.log_file = join(self.tmp_dir, "desktop.log")
         self.create_log_file()
         self.debug_command = '--ascdesktop-support-debug-info'
-        self.log_out_cmd = f'--ascdesktop-log-file={"stdout" if HostInfo().os != "windows" else self.log_file}'
+        self.log_out_cmd = f'--ascdesktop-log-file="stdout"'
 
     def open(self, file_path: str = None, debug_mode: bool = False, log_out_mode: bool = False) -> Popen:
         command = (
@@ -54,10 +54,7 @@ class DesktopEditor:
                 )
 
     def get_version(self) -> "str | None":
-        version = re.findall(
-            r"\d+\.\d+\.\d+\.\d+",
-            FileUtils.output_cmd(f'{self._generate_running_command()} --version')
-        )
+        version = re.findall(r"\d+\.\d+\.\d+\.\d+", FileUtils.output_cmd(self._generate_get_version_cmd()))
         return version[0] if version else None
 
     def _read_log(self, wait_msg: str, stdout_process: Popen) -> str:
@@ -69,7 +66,6 @@ class DesktopEditor:
             if wait_msg == line.strip():
                 self.create_log_file()
                 return line.strip()
-
 
     def create_log_file(self):
         FileUtils.create_dir(dirname(self.log_file), stdout=False)
@@ -87,6 +83,12 @@ class DesktopEditor:
         if run_cmd:
             return run_cmd
         raise ValueError(f"[red]|ERROR| Can't get running command, key: {HostInfo().os}_run_command")
+
+    def _generate_get_version_cmd(self) -> str:
+        if self.os.lower() == 'windows':
+            path = re.search(r"'(.*?)'", self._generate_running_command())
+            return f"powershell.exe (Get-Item '{path.group(1) if path else None}').VersionInfo.FileVersion"
+        return f'{self._generate_running_command()} --version'
 
     @staticmethod
     def _get_config(path):
