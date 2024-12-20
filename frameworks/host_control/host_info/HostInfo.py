@@ -30,7 +30,7 @@ class HostInfo:
 
     def name(self, pretty: bool = False) -> str:
         if self.os == 'windows':
-            return self.os
+            return f"{self.os} {self.version}" if pretty else self.os
         return Unix().pretty_name if pretty else Unix().id
 
     @property
