@@ -36,7 +36,7 @@ class HostInfo:
     @property
     def release(self) -> str:
         if self.__release is None:
-            self.__release = release()
+            self.__release = release().lower()
         return self.__release
 
     @property
