@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import os
 import re
 import time
 from os.path import join, dirname, isfile, basename, realpath
@@ -19,7 +20,7 @@ class DesktopEditor:
         self.package = Package(data)
         self.os = HostInfo().os
         self.tmp_dir = data.tmp_dir
-        self.log_file = FileUtils.unique_name(self.tmp_dir, extension='log')
+        self.log_file = FileUtils.unique_name(os.getcwd(), extension='txt')
         self.create_log_file()
         self.debug_command = '--ascdesktop-support-debug-info'
         self.log_out_cmd = self._get_log_out_cmd()
@@ -98,10 +99,15 @@ class DesktopEditor:
             return wait_msg in output
 
     def _check_in_log_file(self, wait_msg: str) -> bool:
-        for output in [line.strip() for line in FileUtils.file_read_lines(self.log_file)]:
-            if output:
-                console.print(f"[cyan]|INFO| {output}")
-                if wait_msg in output:
-                    self.create_log_file()
+        try:
+
+            for output in [line.strip() for line in FileUtils.file_read_lines(self.log_file)]:
+                if output:
+                    console.print(f"[cyan]|INFO| {output}")
+                    if wait_msg in output:
+                        self.create_log_file()
                     return True
-        return False
+            return False
+
+        except PermissionError:
+            return False
