@@ -45,8 +45,8 @@ class DesktopEditor:
             while (time.time() - start_time) < timeout:
                 status.update(f'[green]|INFO| Waiting for {wait_msg}: {timeout-(time.time() - start_time):.02f} sec.')
                 output = self._read_log(wait_msg, stdout_process)
-                print(f"output: {output}")
                 if output:
+                    print(f"output: {output}")
                     console.print(f"[cyan]|INFO| {output}")
                     if wait_msg in output:
                         break
