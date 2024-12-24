@@ -32,7 +32,6 @@ class DesktopTests:
     ):
         self.config = FileUtils.read_json(custom_config) if custom_config else TestData.config
         self.telegram_report = telegram
-        self.release_name = HostInfo().release
         self.version = version
         self.update_from = update_from
         self.virtual_display = virtual_display
@@ -46,6 +45,7 @@ class DesktopTests:
         self.old_desktop = self._create_desktop(update_from, custom_config, license_file_path) if update_from else None
         if HostInfo().release not in ['vista']:
             self.error_images = [Image.read(img_path=path) for path in FileUtils.get_paths(join(self.img_dir, 'errors'))]
+
         FileUtils.create_dir(self.report.dir, stdout=False)
 
     def open_test(self):
@@ -107,7 +107,7 @@ class DesktopTests:
             raise TestException(f"[red]|ERROR| The version is not correct: {version}")
 
     def check_error_on_screen(self):
-        if self.release_name in ['vista']:
+        if  HostInfo().release in ['vista']:
             return
 
         self._close_warning_window()
