@@ -14,7 +14,6 @@ class UrlGenerator:
         self.host_name = HostInfo().name().lower()
         self.host_version = HostInfo().version
         self.config = self._get_config(data.custom_config_path)
-        self.cef107_system: list = self.config['cef107_system'] # f"{HostInfo().name().lower()} {HostInfo().version}"
         print(f"[green]|INFO| Host Information: {self.host_name} {HostInfo().version}")
 
     @property
@@ -23,9 +22,9 @@ class UrlGenerator:
 
     @property
     def package_name(self):
-        if f"{self.host_name} {self.host_version}" in self.cef107_system:
+        if f"{self.host_name} {self.host_version}" in self._get_cef107_system():
             package_key = 'package_cef107'
-        elif self.host_name == 'windows' and HostInfo().release in self.config['xp_system']:
+        elif self.host_name == 'windows' and HostInfo().release in self._get_xp_system():
             package_key = 'package_xp'
         else:
             package_key = 'package'
@@ -66,3 +65,11 @@ class UrlGenerator:
     def _get_config(path: str):
         config_path = path if path and isfile(path) else join(dirname(realpath(__file__)), 'url_config.json')
         return FileUtils.read_json(config_path)
+
+    def _get_cef107_system(self) -> list:
+        # [f"{HostInfo().name().lower()} {HostInfo().version}"]
+        return self.config['cef107_system']
+
+    def _get_xp_system(self) -> list:
+        # ["HostInfo().release"]
+        return self.config['xp_system']
