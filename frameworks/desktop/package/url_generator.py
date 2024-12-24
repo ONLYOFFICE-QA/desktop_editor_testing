@@ -13,6 +13,7 @@ class UrlGenerator:
         self.version = VersionHandler(data.version)
         self.host_name = HostInfo().name().lower()
         self.host_version = HostInfo().version
+        self.release_name = HostInfo().release
         self.config = self._get_config(data.custom_config_path)
         self.cef107_system: list = self.config['cef107_system'] # f"{HostInfo().name().lower()} {HostInfo().version}"
         print(f"[green]|INFO| Host Information: {self.host_name} {HostInfo().version}")
@@ -24,8 +25,13 @@ class UrlGenerator:
     @property
     def package_name(self):
         if f"{self.host_name} {self.host_version}" in self.cef107_system:
-            return self._get_package_name('package_cef107')
-        return self._get_package_name('package')
+            package_key = 'package_cef107'
+        elif self.host_name == 'windows' and self.release_name in ['vista', 'xp']:
+            package_key = 'package_xp'
+        else:
+            package_key = 'package'
+
+        return self._get_package_name(package_key)
 
     @property
     def _host(self):
