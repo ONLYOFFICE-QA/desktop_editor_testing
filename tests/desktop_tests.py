@@ -10,7 +10,8 @@ from pyvirtualdisplay import Display
 from frameworks.desktop import DesktopEditor, DesktopData, DesktopException, UrlException, PackageException
 from frameworks.test_data import TestData
 from frameworks.host_control import FileUtils, HostInfo, Window
-from frameworks.image_handler import Image
+if HostInfo().release not in ['vista']:
+    from frameworks.image_handler import Image
 from tests.tools.desktop_report import DesktopReport
 
 
