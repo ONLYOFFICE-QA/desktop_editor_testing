@@ -44,7 +44,8 @@ class DesktopTests:
         self.good_files = TestData.good_files_dir
         self.desktop = self._create_desktop(self.version, custom_config, license_file_path)
         self.old_desktop = self._create_desktop(update_from, custom_config, license_file_path) if update_from else None
-        self.error_images = [Image.read(img_path=path) for path in FileUtils.get_paths(join(self.img_dir, 'errors'))]
+        if HostInfo().release not in ['vista']:
+            self.error_images = [Image.read(img_path=path) for path in FileUtils.get_paths(join(self.img_dir, 'errors'))]
         FileUtils.create_dir(self.report.dir, stdout=False)
 
     def open_test(self):
