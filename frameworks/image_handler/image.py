@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
+from frameworks.host_control import HostInfo
 
-import cv2
+if  HostInfo().release not in ['vista']:
+    import cv2
+
 import numpy as np
 
-from PIL import Image, ImageGrab
+from PIL import ImageGrab
 
 class Image:
 
