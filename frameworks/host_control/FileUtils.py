@@ -116,6 +116,11 @@ class FileUtils:
             return file.read()
 
     @staticmethod
+    def file_read_lines(file_path, mode='r') -> list:
+        with open(file_path, mode) as file:
+            return file.readlines()
+
+    @staticmethod
     def file_writer(file_path, text, mode='w'):
         with open(file_path, mode) as file:
             file.write(text)
