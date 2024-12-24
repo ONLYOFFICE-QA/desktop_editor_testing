@@ -98,7 +98,7 @@ class DesktopEditor:
             return wait_msg in output
 
     def _check_in_log_file(self, wait_msg: str) -> bool:
-        for output in [line.strip() for line in FileUtils.file_read_lines(r"C:\db\test\1.txt")]:
+        for output in [line.strip() for line in FileUtils.file_read_lines(self.log_file)]:
             if output:
                 console.print(f"[cyan]|INFO| {output}")
                 if wait_msg in output:
