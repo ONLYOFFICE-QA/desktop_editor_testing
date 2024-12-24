@@ -2,7 +2,7 @@
 import numpy as np
 from PIL import ImageGrab
 
-from frameworks.image_handler import Image
+from .image import Image
 
 
 class ImageOldSystem(Image):
