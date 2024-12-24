@@ -10,8 +10,7 @@ from pyvirtualdisplay import Display
 from frameworks.desktop import DesktopEditor, DesktopData, DesktopException, UrlException, PackageException
 from frameworks.test_data import TestData
 from frameworks.host_control import FileUtils, HostInfo, Window
-if HostInfo().release not in ['vista']:
-    from frameworks.image_handler import Image
+from frameworks.image_handler import Image
 from tests.tools.desktop_report import DesktopReport
 
 
@@ -43,9 +42,7 @@ class DesktopTests:
         self.good_files = TestData.good_files_dir
         self.desktop = self._create_desktop(self.version, custom_config, license_file_path)
         self.old_desktop = self._create_desktop(update_from, custom_config, license_file_path) if update_from else None
-        if HostInfo().release not in ['vista']:
-            self.error_images = [Image.read(img_path=path) for path in FileUtils.get_paths(join(self.img_dir, 'errors'))]
-
+        self.error_images = [Image.read(img_path=path) for path in FileUtils.get_paths(join(self.img_dir, 'errors'))]
         FileUtils.create_dir(self.report.dir, stdout=False)
 
     def open_test(self):
@@ -107,7 +104,9 @@ class DesktopTests:
             raise TestException(f"[red]|ERROR| The version is not correct: {version}")
 
     def check_error_on_screen(self):
-        if  HostInfo().release in ['vista']:
+        if  HostInfo().release in ['vista', 'xp']:
+            self._close_warning_window()
+            Image.make_screenshot(join(self.report.dir, f'{self.version}_{self.host_name}_error_screen.png'))
             return
 
         self._close_warning_window()
