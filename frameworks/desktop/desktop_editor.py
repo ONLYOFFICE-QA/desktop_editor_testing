@@ -6,6 +6,7 @@ from subprocess import Popen, PIPE
 from frameworks.host_control import HostInfo, FileUtils
 from rich import print
 from rich.console import Console
+from tempfile import gettempdir
 from .package import Package
 from .data import Data
 
@@ -22,7 +23,7 @@ class DesktopEditor:
         self.log_file = join(self.tmp_dir, "desktop.log")
         self.create_log_file()
         self.debug_command = '--ascdesktop-support-debug-info'
-        self.log_out_cmd = f'--ascdesktop-log-file="stdout"'
+        self.log_out_cmd = self._get_log_out_cmd()
 
     def open(self, file_path: str = None, debug_mode: bool = False, log_out_mode: bool = False) -> Popen:
         command = (
@@ -94,3 +95,12 @@ class DesktopEditor:
     def _get_config(path):
         config_path = path if path and isfile(path) else join(dirname(realpath(__file__)), 'desktop_config.json')
         return FileUtils.read_json(config_path)
+
+    @staticmethod
+    def _get_log_out_cmd() -> str:
+        if HostInfo().release in ['vista', 'xp']:
+            log = FileUtils.unique_name(gettempdir(), extension='txt')
+        else:
+            log = 'stdout'
+
+        return f'--ascdesktop-log-file="{log}"'
