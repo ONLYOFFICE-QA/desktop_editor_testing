@@ -31,7 +31,7 @@ class DesktopTests:
     ):
         self.config = FileUtils.read_json(custom_config) if custom_config else TestData.config
         self.telegram_report = telegram
-        self.os_name = HostInfo().name(pretty=True)
+        self.release_name = HostInfo().release
         self.version = version
         self.update_from = update_from
         self.virtual_display = virtual_display
@@ -105,7 +105,7 @@ class DesktopTests:
             raise TestException(f"[red]|ERROR| The version is not correct: {version}")
 
     def check_error_on_screen(self):
-        if self.os_name in ['windows vista']:
+        if self.release_name in ['vista']:
             return
 
         self._close_warning_window()
