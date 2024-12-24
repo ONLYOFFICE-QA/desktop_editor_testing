@@ -6,7 +6,6 @@ from subprocess import Popen, PIPE
 from frameworks.host_control import HostInfo, FileUtils
 from rich import print
 from rich.console import Console
-from tempfile import gettempdir
 from .package import Package
 from .data import Data
 
@@ -20,10 +19,11 @@ class DesktopEditor:
         self.package = Package(data)
         self.os = HostInfo().os
         self.tmp_dir = data.tmp_dir
-        self.log_file = join(self.tmp_dir, "desktop.log")
+        self.log_file = FileUtils.unique_name(self.tmp_dir, extension='log')
         self.create_log_file()
         self.debug_command = '--ascdesktop-support-debug-info'
         self.log_out_cmd = self._get_log_out_cmd()
+        print(self.log_out_cmd)
 
     def open(self, file_path: str = None, debug_mode: bool = False, log_out_mode: bool = False) -> Popen:
         command = (
@@ -65,7 +65,7 @@ class DesktopEditor:
 
         for line in FileUtils.file_reader(self.log_file).split('\n'):
             print(line) if line else ...
-            if wait_msg == line.strip():
+            if wait_msg in line.strip():
                 self.create_log_file()
                 return line.strip()
 
@@ -97,11 +97,6 @@ class DesktopEditor:
         config_path = path if path and isfile(path) else join(dirname(realpath(__file__)), 'desktop_config.json')
         return FileUtils.read_json(config_path)
 
-    @staticmethod
-    def _get_log_out_cmd() -> str:
-        if HostInfo().release in ['vista', 'xp']:
-            log = FileUtils.unique_name(gettempdir(), extension='txt')
-        else:
-            log = 'stdout'
-
+    def _get_log_out_cmd(self) -> str:
+        log = self.log_file if HostInfo().release in  ['vista', 'xp'] else 'stdout'
         return f'--ascdesktop-log-file="{log}"'
