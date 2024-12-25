@@ -20,7 +20,7 @@ class DesktopEditor:
         self.package = Package(data)
         self.os = HostInfo().os
         self.tmp_dir = data.tmp_dir
-        self.log_file = FileUtils.unique_name(os.getcwd(), extension='txt')
+        self.log_file = FileUtils.unique_name(self.tmp_dir, extension='txt')
         self.create_log_file()
         self.debug_command = '--ascdesktop-support-debug-info'
         self.log_out_cmd = self._get_log_out_cmd()
