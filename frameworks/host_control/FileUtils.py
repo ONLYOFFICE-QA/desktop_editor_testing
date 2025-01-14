@@ -2,6 +2,7 @@
 import json
 from os import makedirs, walk
 from os.path import isfile, isdir, join, basename, getsize, exists
+from random import randint
 from shutil import copyfile
 from subprocess import getoutput, Popen, PIPE
 from codecs import open as codecs_open
@@ -115,6 +116,11 @@ class FileUtils:
             return file.read()
 
     @staticmethod
+    def file_read_lines(file_path, mode='r') -> list:
+        with open(file_path, mode) as file:
+            return file.readlines()
+
+    @staticmethod
     def file_writer(file_path, text, mode='w'):
         with open(file_path, mode) as file:
             file.write(text)
@@ -132,6 +138,21 @@ class FileUtils:
         stderr = stderr.strip().decode('utf-8', errors='ignore')
         popen.stdout.close(), popen.stderr.close()
         return stdout, stderr
+
+    @staticmethod
+    def unique_name(path: str, extension: str = None) -> str:
+        """
+        Generate a unique filename in a given directory.
+
+        :param path: The directory path in which to generate the unique filename.
+        :param extension: (Optional) The extension for the filename. If provided, it should not contain a leading period.
+        :return: A unique filename with an optional extension.
+        """
+        _ext = extension.replace(".", "") if extension else None
+        while True:
+            random_path = join(path, f"{randint(500, 50000)}{('.' + _ext) if _ext else ''}".strip())
+            if not exists(random_path):
+                return random_path
 
     @staticmethod
     def get_paths(dir_path: str, extension: "tuple | str" = None) -> list:

@@ -2,6 +2,7 @@
   "title": "ONLYOFFICE",
   "host": "https://s3.eu-west-1.amazonaws.com/repo-doc-onlyoffice-com/desktop",
   "cef107_system": ["ubuntu 14.04"],
+  "xp_system": ["vista", "xp"],
   "os_family": {
     "debian": ["debian", "ubuntu", "linuxmint", "pop"],
     "rhel": ["centos", "redos", "altlinux", "fedora"],
@@ -22,7 +23,8 @@
       "package": "onlyoffice-desktopeditors-[version].suse12.x86_64.rpm"
     },
     "inno": {
-      "package": "ONLYOFFICE-DesktopEditors-[version]-x64.exe"
+      "package": "ONLYOFFICE-DesktopEditors-[version]-x64.exe",
+      "package_xp": "ONLYOFFICE-DesktopEditors-[version]-x64-xp.exe"
     }
   }
 }

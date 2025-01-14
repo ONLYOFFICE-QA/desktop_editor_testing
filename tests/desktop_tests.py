@@ -104,7 +104,13 @@ class DesktopTests:
             raise TestException(f"[red]|ERROR| The version is not correct: {version}")
 
     def check_error_on_screen(self):
+        if  HostInfo().release in ['vista', 'xp']:
+            self._close_warning_window()
+            Image.make_screenshot(join(self.report.dir, f'{self.version}_{self.host_name}_error_screen.png'))
+            return
+
         self._close_warning_window()
+        time.sleep(0.5)
         for error_img in self.error_images:
             if Image.is_present(error_img):
                 Image.make_screenshot(join(self.report.dir, f'{self.version}_{self.host_name}_error_screen.png'))
