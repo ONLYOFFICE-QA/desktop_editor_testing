@@ -1,32 +1,44 @@
 # -*- coding: utf-8 -*-
 from invoke import task
 
-from tests.desktop_tests import DesktopTests
+from tests import OpenTest, TestTools, TestData
 
 
 @task
-def open_test(c, version=None, update_from=None, display=False, config=None, telegram=False, license=None):
-    DesktopTests(
+def open_test(
+        c,
+        version: str = None,
+        update_from: str = None,
+        display: bool = False,
+        config: str = None,
+        telegram: bool = False,
+        license: str = None
+):
+    config = TestData(
         version=version,
         update_from=update_from,
         virtual_display=display,
         custom_config=config if config else None,
         telegram=telegram,
         license_file_path=license
-    ).open_test()
+    )
+
+    OpenTest(test_data=config).run()
 
 
 @task
-def install_desktop(c, version=None, config=None, license=None):
-    test = DesktopTests(
-        version=version,
-        virtual_display=False,
-        custom_config=config if config else None,
-        license_file_path=license
+def install_desktop(c, version: str = None, config: str = None, license: str = None, debug: bool = False):
+    tools = TestTools(
+        TestData(
+            version=version,
+            virtual_display=False,
+            custom_config=config if config else None,
+            license_file_path=license
+        )
     )
 
-    test.install_package(test.version, test.desktop)
-    test.check_installed()
-    test.check_correct_version()
-    test.desktop.set_license()
-    test.desktop.open(debug_mode=True)
+    tools.install_package(desktop=tools.desktop)
+    tools.check_installed()
+    tools.check_correct_version()
+    tools.desktop.set_license()
+    tools.desktop.open(debug_mode=debug)
