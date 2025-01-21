@@ -9,6 +9,7 @@ except ImportError:
     sb.call("pip install tomlkit==0.11.6", shell=True)
     import tomlkit
 
+RELEASE = platform.release().lower()
 OS = platform.system().lower()
 REQUIREMENTS_FILE = "requirements.txt"
 POETRY_FILE = "pyproject.toml"
@@ -17,6 +18,11 @@ PYTHON36_VERSIONS = {
     "opencv-python": "4.3.0.38",
     "rich": "12.6.0"
 }
+
+WINDOWS_VISTA = {
+    "pywin32": "221"
+}
+
 
 def write_to_file(content, mode="w"):
     with open(REQUIREMENTS_FILE, mode) as f:
@@ -30,6 +36,8 @@ def get_dependency_version(package, version_info, is_old_python):
         if "git" in version_info:
             return f"git+{version_info['git']}@{version_info.get('branch', 'main')}"
         if package.lower() == "pywin32":
+            if RELEASE in ['vista', 'xp']:
+                return re.sub(r"[*^]", "", WINDOWS_VISTA.get("pywin32", ""))
             return re.sub(r"[*^]", "", version_info.get("version", ""))
     elif is_old_python:
         return get_version_for_old_python(package)
