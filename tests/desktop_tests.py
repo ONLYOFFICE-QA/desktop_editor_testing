@@ -180,11 +180,13 @@ class DesktopTests:
             if not window_hwnd:
                 continue
 
-            button_hwnd = window.get_child_window_hwnd(
-                window_hwnd,
-                info.get('button_class_name', ''),
-                info.get('button_text', '')
-            )
-
-            if button_hwnd:
-                window.click_on_button(button_hwnd)
+            window.close(window_hwnd)
+            #
+            # button_hwnd = window.get_child_window_hwnd(
+            #     window_hwnd,
+            #     info.get('button_class_name', ''),
+            #     info.get('button_text', '')
+            # )
+            #
+            # if button_hwnd:
+            #     window.click_on_button(button_hwnd)

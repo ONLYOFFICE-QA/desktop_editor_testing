@@ -46,5 +46,9 @@ class WindowsWindow(Window):
         except Exception as ex:
             print(ex)
 
-
-
+    @staticmethod
+    def close(hwnd: int) -> None:
+        try:
+            win32gui.PostMessage(hwnd, win32con.WM_CLOSE, 0, 0)
+        except Exception as e:
+            print(f"[red]|WARNING| Can't close the window. Exception: {e}")
