@@ -20,7 +20,7 @@ PYTHON36_VERSIONS = {
 }
 
 WINDOWS_VISTA = {
-    "pywin32": "221"
+    "pywin32": "223"
 }
 
 
