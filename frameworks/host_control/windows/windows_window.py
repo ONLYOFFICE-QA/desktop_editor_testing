@@ -18,10 +18,8 @@ class WindowsWindow(Window):
 
         def enum_windows_callback(hwnd: int, data: list):
             if win32gui.IsWindowVisible(hwnd):
-                if (
-                        class_name.strip() == win32gui.GetClassName(hwnd).strip()
-                        and text.strip() == win32gui.GetWindowText(hwnd).strip()
-                ):
+                _cls_name, _text = win32gui.GetClassName(hwnd), win32gui.GetWindowText(hwnd)
+                if class_name.strip() == _cls_name.strip() and text.strip() == _text.strip():
                     data.append(hwnd)
 
         win32gui.EnumWindows(enum_windows_callback, data)
