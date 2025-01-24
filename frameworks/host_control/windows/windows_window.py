@@ -23,7 +23,6 @@ class WindowsWindow(Window):
                     data.append(hwnd)
 
         win32gui.EnumWindows(enum_windows_callback, data)
-        print(data)
         return data[0] if data else None
 
     @staticmethod
