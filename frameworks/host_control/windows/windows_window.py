@@ -13,15 +13,13 @@ except ImportError:
 class WindowsWindow(Window):
 
     @staticmethod
-    def get_hwnd(class_name: str, text: str) -> Optional[int]:
+    def get_hwnd(class_name: str, text: str) -> list:
         data = []
 
         def enum_windows_callback(hwnd: int, data: list):
             if win32gui.IsWindowVisible(hwnd):
-                if (
-                        class_name.strip() == win32gui.GetClassName(hwnd).strip()
-                        and text.strip() == win32gui.GetWindowText(hwnd).strip()
-                ):
+                _cls_name, _text = win32gui.GetClassName(hwnd), win32gui.GetWindowText(hwnd)
+                if class_name.strip() == _cls_name.strip() and text.strip() == _text.strip():
                     data.append(hwnd)
 
         win32gui.EnumWindows(enum_windows_callback, data)
@@ -46,5 +44,9 @@ class WindowsWindow(Window):
         except Exception as ex:
             print(ex)
 
-
-
+    @staticmethod
+    def close(hwnd: int) -> None:
+        try:
+            win32gui.PostMessage(hwnd, win32con.WM_CLOSE, 0, 0)
+        except Exception as e:
+            print(f"[red]|WARNING| Can't close the window. Exception: {e}")

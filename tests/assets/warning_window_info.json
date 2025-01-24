@@ -4,5 +4,10 @@
     "window_text": "ONLYOFFICE Desktop Editors",
     "button_class_name": "Button",
     "button_text": "No"
+  },
+
+  "Default_app_window_vista": {
+    "class_name": "Qt5QWindowIcon",
+    "window_text": "ONLYOFFICE Desktop Editors"
   }
 }

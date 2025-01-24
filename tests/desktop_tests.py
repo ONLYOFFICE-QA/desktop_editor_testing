@@ -45,6 +45,10 @@ class DesktopTests:
         self.error_images = [Image.read(img_path=path) for path in FileUtils.get_paths(join(self.img_dir, 'errors'))]
         FileUtils.create_dir(self.report.dir, stdout=False)
 
+    @property
+    def is_old_os(self):
+        return HostInfo().release in ['vista', 'xp']
+
     def open_test(self):
         if self.update_from:
             self.install_package(
@@ -72,9 +76,11 @@ class DesktopTests:
             if basename(file) in self.config.get('exception_files', []):
                 print(f"[green]|INFO| File `{basename(file)}` skipped to open.")
                 continue
+
             print(f"[green]|INFO| Test opening file: {basename(file)}")
             self.desktop.open(file, log_out_mode=True)
             time.sleep(15)  # TODO
+            self._close_warning_window()
             self.check_error_on_screen()
             Image.make_screenshot(f"{join(self.report.dir, f'{self.version}_{self.host_name}_{basename(file)}.png')}")
 
@@ -82,6 +88,7 @@ class DesktopTests:
         try:
             self.desktop.wait_until_open(stdout_process, wait_msg, timeout=timeout)
             time.sleep(1)  # todo
+            self._close_warning_window() if not self.is_old_os else None
             self.check_error_on_screen()
             Image.make_screenshot(f"{join(self.report.dir, f'{self.version}_{self.host_name}_open_editor.png')}")
         except DesktopException:
@@ -104,13 +111,10 @@ class DesktopTests:
             raise TestException(f"[red]|ERROR| The version is not correct: {version}")
 
     def check_error_on_screen(self):
-        if  HostInfo().release in ['vista', 'xp']:
-            self._close_warning_window()
-            Image.make_screenshot(join(self.report.dir, f'{self.version}_{self.host_name}_error_screen.png'))
-            return
+        if self.is_old_os:
+            return print("[cyan]|INFO| OpenCv not supported on this OS")
 
-        self._close_warning_window()
-        time.sleep(0.5)
+        print(f"[green]|INFO| Check errors on screen")
         for error_img in self.error_images:
             if Image.is_present(error_img):
                 Image.make_screenshot(join(self.report.dir, f'{self.version}_{self.host_name}_error_screen.png'))
@@ -180,11 +184,5 @@ class DesktopTests:
             if not window_hwnd:
                 continue
 
-            button_hwnd = window.get_child_window_hwnd(
-                window_hwnd,
-                info.get('button_class_name', ''),
-                info.get('button_text', '')
-            )
-
-            if button_hwnd:
-                window.click_on_button(button_hwnd)
+            window.close(window_hwnd)
+            time.sleep(0.5)
