@@ -82,7 +82,6 @@ class DesktopTests:
         try:
             self.desktop.wait_until_open(stdout_process, wait_msg, timeout=timeout)
             time.sleep(1)  # todo
-            self.check_error_on_screen()
             Image.make_screenshot(f"{join(self.report.dir, f'{self.version}_{self.host_name}_open_editor.png')}")
         except DesktopException:
             self._write_results('NOT_OPENED')
@@ -105,6 +104,7 @@ class DesktopTests:
 
     def check_error_on_screen(self):
         if  HostInfo().release in ['vista', 'xp']:
+            self._close_warning_window()
             Image.make_screenshot(join(self.report.dir, f'{self.version}_{self.host_name}_error_screen.png'))
             return
 
