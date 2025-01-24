@@ -76,6 +76,7 @@ class DesktopTests:
             if basename(file) in self.config.get('exception_files', []):
                 print(f"[green]|INFO| File `{basename(file)}` skipped to open.")
                 continue
+
             print(f"[green]|INFO| Test opening file: {basename(file)}")
             self.desktop.open(file, log_out_mode=True)
             time.sleep(15)  # TODO
