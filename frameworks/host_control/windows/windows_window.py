@@ -13,7 +13,7 @@ except ImportError:
 class WindowsWindow(Window):
 
     @staticmethod
-    def get_hwnd(class_name: str, text: str) -> Optional[int]:
+    def get_hwnd(class_name: str, text: str) -> list:
         data = []
 
         def enum_windows_callback(hwnd: int, data: list):
@@ -23,7 +23,7 @@ class WindowsWindow(Window):
                     data.append(hwnd)
 
         win32gui.EnumWindows(enum_windows_callback, data)
-        return data[0] if data else None
+        return data
 
     @staticmethod
     def get_child_window_hwnd(window_hwnd: int, child_window_title: str, child_window_text: str) -> Optional[int]:

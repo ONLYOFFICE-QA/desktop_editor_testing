@@ -175,12 +175,14 @@ class DesktopTests:
         window = Window()
 
         for info in self.warning_window_info.values():
-            window_hwnd = window.get_hwnd(info.get('class_name', ''), info.get('window_text', ''))
+            window_hwnd_list = window.get_hwnd(info.get('class_name', ''), info.get('window_text', ''))
 
-            if not window_hwnd:
+            if not window_hwnd_list:
                 continue
 
-            window.close(window_hwnd)
+            if HostInfo().release in ['vista', 'xp']:
+                if len(window_hwnd_list) >= 2:
+                    window.close(window_hwnd_list[1])
             #
             # button_hwnd = window.get_child_window_hwnd(
             #     window_hwnd,
