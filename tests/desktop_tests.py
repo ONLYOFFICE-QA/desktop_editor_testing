@@ -105,7 +105,6 @@ class DesktopTests:
 
     def check_error_on_screen(self):
         if  HostInfo().release in ['vista', 'xp']:
-            self._close_warning_window()
             Image.make_screenshot(join(self.report.dir, f'{self.version}_{self.host_name}_error_screen.png'))
             return
 
@@ -175,14 +174,14 @@ class DesktopTests:
         window = Window()
 
         for info in self.warning_window_info.values():
-            window_hwnd_list = window.get_hwnd(info.get('class_name', ''), info.get('window_text', ''))
+            window_hwnd = window.get_hwnd(info.get('class_name', ''), info.get('window_text', ''))
 
-            if not window_hwnd_list:
+            if not window_hwnd:
                 continue
-
-            if HostInfo().release in ['vista', 'xp']:
-                if len(window_hwnd_list) >= 2:
-                    window.close(window_hwnd_list[1])
+            #
+            # if HostInfo().release in ['vista', 'xp']:
+            #     if len(window_hwnd_list) >= 2:
+            window.close(window_hwnd)
             #
             # button_hwnd = window.get_child_window_hwnd(
             #     window_hwnd,

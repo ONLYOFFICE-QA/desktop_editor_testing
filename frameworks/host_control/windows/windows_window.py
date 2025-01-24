@@ -23,7 +23,7 @@ class WindowsWindow(Window):
                     data.append(hwnd)
 
         win32gui.EnumWindows(enum_windows_callback, data)
-        return data
+        return data[0] if data else None
 
     @staticmethod
     def get_child_window_hwnd(window_hwnd: int, child_window_title: str, child_window_text: str) -> Optional[int]:
