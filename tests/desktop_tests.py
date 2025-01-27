@@ -185,4 +185,5 @@ class DesktopTests:
                 continue
 
             window.close(window_hwnd)
-            time.sleep(0.5)
+
+        time.sleep(0.5)
