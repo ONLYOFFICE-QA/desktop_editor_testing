@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
-from tests.tools.test_data import TestData
 from frameworks.host_control import HostInfo
-from tests.tools.test_tools import TestTools
+from ..tools import TestTools, TestData
 
 
 class OpenTest:

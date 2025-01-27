@@ -8,8 +8,9 @@ from pyvirtualdisplay import Display
 from frameworks.desktop import DesktopException, DesktopEditor, DesktopData, UrlException, PackageException
 from frameworks.host_control import FileUtils, HostInfo, Window
 from frameworks.image_handler import Image
-from tests.tools import Paths, DesktopReport, TestData
 from frameworks.test_exceptions import TestException
+
+from ..tools import Paths, DesktopReport, TestData
 
 
 
