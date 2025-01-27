@@ -11,6 +11,7 @@ class DesktopReport:
     def __init__(self, report_path: str):
         self.path = report_path
         self.dir = dirname(self.path)
+        FileUtils.create_dir(self.dir, stdout=False)
 
     def write(self, os: str, version: str, package_name: str, exit_code: str, tg_msg: bool = False, update_from: str = None):
         self._write_titles() if not isfile(self.path) else ...

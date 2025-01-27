@@ -1,20 +1,21 @@
 # -*- coding: utf-8 -*-
-import os
 import re
 import time
 from os.path import join, dirname, isfile, basename, realpath
 from subprocess import Popen, PIPE
 from frameworks.host_control import HostInfo, FileUtils
+from frameworks.test_exceptions import DesktopException
 from rich import print
 from rich.console import Console
+
 from .package import Package
 from .data import Data
 
 console = Console()
-class DesktopException(Exception): ...
 
 class DesktopEditor:
     def __init__(self, data: Data):
+        self.data = data
         self.lic_file_path = data.lic_file
         self.config = self._get_config(data.custom_config_path)
         self.package = Package(data)
@@ -92,7 +93,8 @@ class DesktopEditor:
         log = self.log_file if HostInfo().release in  ['vista', 'xp'] else 'stdout'
         return f'--ascdesktop-log-file="{log}"'
 
-    def _check_in_output(self, wait_msg: str, stdout_process: Popen) -> bool:
+    @staticmethod
+    def _check_in_output(wait_msg: str, stdout_process: Popen) -> bool:
         output = stdout_process.stdout.readline().decode().strip()
         if output:
             console.print(f"[cyan]|INFO| {output}")
@@ -100,7 +102,6 @@ class DesktopEditor:
 
     def _check_in_log_file(self, wait_msg: str) -> bool:
         try:
-
             for output in [line.strip() for line in FileUtils.file_read_lines(self.log_file)]:
                 if output:
                     console.print(f"[cyan]|INFO| {output}")
