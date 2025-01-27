@@ -14,7 +14,7 @@ class OpenTest:
         self.test_tools.check_installed()
         self.test_tools.check_correct_version()
         self.test_tools.desktop.set_license()
-        self.test_tools.check_open_desktop(self.test_tools.desktop.open(log_out_mode=True))
+        self.test_tools.check_open_desktop()
         self.test_tools.check_open_files(self.data.path.good_files_dir)
         self.test_tools.write_results(f'Passed')
         self.test_tools.display.stop() if self.test_tools.virtual_display else ...

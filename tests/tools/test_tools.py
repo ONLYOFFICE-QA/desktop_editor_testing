@@ -2,6 +2,7 @@
 import re
 import time
 from os.path import basename, join
+from rich import print
 
 from pyvirtualdisplay import Display
 
@@ -10,7 +11,9 @@ from frameworks.host_control import FileUtils, HostInfo, Window
 from frameworks.image_handler import Image
 from frameworks.test_exceptions import TestException
 
-from ..tools import Paths, DesktopReport, TestData
+from .paths import Paths
+from .desktop_report import  DesktopReport
+from .test_data import TestData
 
 
 
@@ -152,4 +155,4 @@ class TestTools:
         time.sleep(0.5)
 
     def _get_error_images(self) -> list:
-        return [Image.read(img_path=path) for path in FileUtils.get_paths(self.data.error_img_dir)]
+        return [Image.read(img_path=path) for path in FileUtils.get_paths(self.path.error_img_dir)]
