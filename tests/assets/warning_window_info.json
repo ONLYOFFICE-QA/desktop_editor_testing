@@ -1,9 +1,12 @@
 {
   "Default_app_window": {
     "class_name": "#32770",
-    "window_text": "ONLYOFFICE Desktop Editors",
-    "button_class_name": "Button",
-    "button_text": "No"
+    "window_text": "ONLYOFFICE Desktop Editors"
+  },
+
+  "Default_app_window2": {
+    "class_name": "#32770",
+    "window_text": "ONLYOFFICE"
   },
 
   "Default_app_window_vista": {
