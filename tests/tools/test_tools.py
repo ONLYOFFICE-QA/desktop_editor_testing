@@ -27,6 +27,10 @@ class TestTools:
         self.report = DesktopReport(self._report_path())
         self.error_images = self._get_error_images()
 
+    @property
+    def is_old_os(self):
+        return HostInfo().release in ['vista', 'xp']
+
     def check_open_files(self, files_dir: str):
         for file in FileUtils.get_paths(files_dir):
             if basename(file) in self.config.get('exception_files', []):
@@ -35,6 +39,7 @@ class TestTools:
             print(f"[green]|INFO| Test opening file: {basename(file)}")
             self.desktop.open(file, log_out_mode=True)
             time.sleep(15)  # TODO
+            self._close_warning_window()
             self.check_error_on_screen()
             Image.make_screenshot(f"{join(self.report.dir, f'{self.data.version}_{self.host_name}_{basename(file)}.png')}")
 
@@ -47,6 +52,7 @@ class TestTools:
             )
 
             time.sleep(1)  # todo
+            self._close_warning_window() if not self.is_old_os else None
             self.check_error_on_screen()
             Image.make_screenshot(f"{join(self.report.dir, f'{self.data.version}_{self.host_name}_open_editor.png')}")
         except DesktopException:
@@ -69,13 +75,10 @@ class TestTools:
             raise TestException(f"[red]|ERROR| The version is not correct: {version}")
 
     def check_error_on_screen(self):
-        if HostInfo().release in ['vista', 'xp']:
-            self._close_warning_window()
-            Image.make_screenshot(join(self.report.dir, f'{self.data.version}_{self.host_name}_error_screen.png'))
-            return
+        if self.is_old_os:
+            return print("[cyan]|INFO| OpenCv not supported on this OS")
 
-        self._close_warning_window()
-        time.sleep(0.5)
+        print(f"[green]|INFO| Check errors on screen")
         for error_img in self.error_images:
             if Image.is_present(error_img):
                 Image.make_screenshot(join(self.report.dir, f'{self.data.version}_{self.host_name}_error_screen.png'))
@@ -89,6 +92,7 @@ class TestTools:
     ) -> None:
         if desktop.package.version == desktop.get_version():
             return print(f'[green]|INFO| Desktop version: {self.data.version} already installed[/]')
+
         try:
             desktop.package.get()
             desktop.package.install(
@@ -96,6 +100,7 @@ class TestTools:
                 apt_get_installer=False,
                 custom_installer=custom_installer
             )
+
         except (UrlException, PackageException) as e:
             self.write_results('CANT_GET_PACKAGE')
             raise TestException(f"[red]|ERROR| Can't get the desktop package. Error: {e}")
@@ -123,7 +128,7 @@ class TestTools:
                 version=version or self.data.version,
                 tmp_dir=self.path.tmp_dir,
                 custom_config_path=self.data.custom_config,
-                lic_file=self.path.license_file_path,
+                lic_file=self.data.license_file_path,
                 cache_dir=self.data.cache_dir
             )
         )
@@ -141,14 +146,9 @@ class TestTools:
             if not window_hwnd:
                 continue
 
-            button_hwnd = window.get_child_window_hwnd(
-                window_hwnd,
-                info.get('button_class_name', ''),
-                info.get('button_text', '')
-            )
+            window.close(window_hwnd)
 
-            if button_hwnd:
-                window.click_on_button(button_hwnd)
+        time.sleep(0.5)
 
     def _get_error_images(self) -> list:
         return [Image.read(img_path=path) for path in FileUtils.get_paths(self.data.error_img_dir)]
