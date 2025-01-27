@@ -93,7 +93,8 @@ class DesktopEditor:
         log = self.log_file if HostInfo().release in  ['vista', 'xp'] else 'stdout'
         return f'--ascdesktop-log-file="{log}"'
 
-    def _check_in_output(self, wait_msg: str, stdout_process: Popen) -> bool:
+    @staticmethod
+    def _check_in_output(wait_msg: str, stdout_process: Popen) -> bool:
         output = stdout_process.stdout.readline().decode().strip()
         if output:
             console.print(f"[cyan]|INFO| {output}")
