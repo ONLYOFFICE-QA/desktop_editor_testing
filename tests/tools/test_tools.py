@@ -30,6 +30,8 @@ class TestTools:
         self.host_name = re.sub(r"[\s/]", "", HostInfo().name(pretty=True))
         self.report = DesktopReport(self._report_path())
         self.error_images = self._get_error_images()
+        self.virtual_display: bool = False
+        self._create_display()
 
     @property
     def is_old_os(self):
@@ -122,6 +124,7 @@ class TestTools:
         if self.data.virtual_display and HostInfo().os != 'windows':
             print("[green]|INFO| The test is running on the virtual display")
             self.display = Display(visible=visible, size=size)
+            self.virtual_display = True
             return self.display.start()
 
         self.virtual_display = False
