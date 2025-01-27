@@ -12,5 +12,10 @@
   "Default_app_window_vista": {
     "class_name": "Qt5QWindowIcon",
     "window_text": "ONLYOFFICE Desktop Editors"
+  },
+
+  "Default_app_window_vista2": {
+    "class_name": "Qt5QWindowIcon",
+    "window_text": "ONLYOFFICE"
   }
 }
