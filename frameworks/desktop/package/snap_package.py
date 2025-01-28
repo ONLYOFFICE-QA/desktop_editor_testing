@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from subprocess import call
-from rich import print
 
 from frameworks.snap import Snap
 
