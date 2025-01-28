@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from frameworks.test_exceptions import TestException
-from tests import TestData, TestTools
+from ..tools import TestData, TestTools
 
 
 class SnapOpenTest:
