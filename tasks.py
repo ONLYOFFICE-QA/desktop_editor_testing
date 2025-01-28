@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 from invoke import task
 
-from tests import OpenTest, TestTools, TestData
-from tests.desktop_tests.snap_open_test import SnapOpenTest
+from tests import OpenTest, SnapOpenTest, TestTools, TestData
 
 
 @task
