@@ -15,7 +15,7 @@ class SnapPackege:
 
     @staticmethod
     def _get_install_cmd() -> str:
-        return "snap install --beta onlyoffice-desktopeditors"
+        return "sudo snap install --beta onlyoffice-desktopeditors"
 
     def _run_cmd(self, cmd: str) -> int:
         return call(cmd, shell=True)
