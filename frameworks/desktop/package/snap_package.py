@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 from subprocess import call
+from rich import print
 
 class SnapPackege:
 
     def install(self) -> None:
-        self.install_snap()
+        if not self.snap_is_installed():
+            self.install_snap()
+
         self._run_cmd(self._get_install_cmd())
 
     @staticmethod
@@ -12,6 +15,7 @@ class SnapPackege:
         return "snap install --beta onlyoffice-desktopeditors"
 
     def install_snap(self):
+        print('[cyan] installing snap...')
         self.update_dependencies()
         self.install_snap_dependencies()
         self._run_cmd('sudo apt install -y snapd')
@@ -33,3 +37,6 @@ class SnapPackege:
 
     def _run_cmd(self, cmd: str) -> int:
         return call(cmd, shell=True)
+
+    def snap_is_installed(self) -> bool:
+        return self._run_cmd('snap version') == 0
