@@ -31,11 +31,16 @@ class TestTools:
         self.report = DesktopReport(self._report_path())
         self.error_images = self._get_error_images()
         self.virtual_display: bool = False
+        self.package_name = self._get_packege_name()
         self._create_display()
 
     @property
-    def is_old_os(self):
+    def is_old_windows_version(self) -> bool:
         return HostInfo().release in ['vista', 'xp']
+
+    @property
+    def is_windows(self) -> bool:
+        return 'windows' == HostInfo().os
 
     def check_open_files(self, files_dir: str):
         for file in FileUtils.get_paths(files_dir):
@@ -59,7 +64,7 @@ class TestTools:
             )
 
             time.sleep(1)  # todo
-            self._close_warning_window() if not self.is_old_os else None
+            self._close_warning_window() if not self.is_old_windows_version else None
             self.check_error_on_screen()
             Image.make_screenshot(f"{join(self.report.dir, f'{self.data.version}_{self.host_name}_open_editor.png')}")
         except DesktopException:
@@ -82,7 +87,7 @@ class TestTools:
             raise TestException(f"[red]|ERROR| The version is not correct: {version}")
 
     def check_error_on_screen(self):
-        if self.is_old_os:
+        if self.is_old_windows_version:
             return print("[cyan]|INFO| OpenCv not supported on this OS")
 
         print(f"[green]|INFO| Check errors on screen")
@@ -116,7 +121,7 @@ class TestTools:
         self.report.write(
             os=HostInfo().name(pretty=True),
             version=self.data.version,
-            package_name=self.desktop.package.name,
+            package_name=self.package_name,
             exit_code=exit_code,
             tg_msg=self.data.telegram
         )
@@ -140,6 +145,11 @@ class TestTools:
                 cache_dir=self.data.cache_dir
             )
         )
+
+    def _get_packege_name(self) -> str:
+        if self.data.snap:
+            return 'Snap'
+        return self.desktop.package.name
 
     def _report_path(self) -> str:
         title = self.config.get('title', 'Undefined_title')
