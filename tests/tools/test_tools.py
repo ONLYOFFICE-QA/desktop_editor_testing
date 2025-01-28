@@ -82,7 +82,7 @@ class TestTools:
 
     def check_correct_version(self):
         version = self.desktop.get_version()
-        if len([i for i in version.split('.') if i]) != 4:
+        if not version or len([i for i in version.split('.') if i]) != 4:
             self.write_results('INCORRECT_VERSION')
             raise TestException(f"[red]|ERROR| The version is not correct: {version}")
 
