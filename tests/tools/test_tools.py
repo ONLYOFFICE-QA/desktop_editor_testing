@@ -142,7 +142,8 @@ class TestTools:
                 tmp_dir=self.path.tmp_dir,
                 custom_config_path=self.data.custom_config,
                 lic_file=self.data.license_file_path,
-                cache_dir=self.data.cache_dir
+                cache_dir=self.data.cache_dir,
+                snap_package=self.data.snap
             )
         )
 

@@ -8,3 +8,4 @@ class Data(NamedTuple):
     cache_dir: str = None
     custom_config_path: str = None
     lic_file: str = None
+    snap_package: bool = False
