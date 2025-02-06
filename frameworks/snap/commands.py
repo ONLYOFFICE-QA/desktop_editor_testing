@@ -15,4 +15,6 @@ class SnapCommands:
         self.version: str = "snap --version"
 
     def _get_install_commands(self) -> list:
+        _key = f"{self._host.os} {self._host.release}"
+        print(f"SnapPackage KEY: {_key}") #TODO
         return self.commands.get(f"{self._host.os} {self._host.release}", [])
