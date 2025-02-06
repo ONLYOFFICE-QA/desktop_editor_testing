@@ -1,0 +1,17 @@
+{
+  "centos 7": [
+    "sudo yum install epel-release -y",
+    "sudo yum install snapd -y",
+    "sudo systemctl enable --now snapd.socket",
+    "sudo ln -s /var/lib/snapd/snap /snap",
+    "sudo systemctl restart snapd"
+  ],
+  "debian 10": [
+    "sudo apt-get update",
+    "sudo apt-get install -y sudo coreutils",
+    "sudo apt-get install -y snapd",
+    "sudo systemctl enable --now snapd",
+    "sudo systemctl start snapd",
+    "sudo snap install core"
+  ]
+}

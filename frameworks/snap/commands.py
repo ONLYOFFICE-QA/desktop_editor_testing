@@ -1,20 +1,18 @@
 # -*- coding: utf-8 -*-
 from dataclasses import dataclass
+from os.path import join, dirname, realpath
+
+from frameworks.host_control import FileUtils, HostInfo
 
 
 @dataclass
 class SnapCommands:
-    snap: str = 'snap'
-    snap_core: str = f'sudo {snap} install core'
-    version: str = f"snap version"
+    commands: dict = FileUtils.read_json(join(dirname(realpath(__file__)), 'commands.json'))
 
     def __post_init__(self):
-        self.run_snapd_service: list = self.get_snapd_service_run_cmd()
-        self.installer = self._get_os_installer()
-        self.install_snapd = f"{self.installer} install -y snapd"
+        self._host = HostInfo()
+        self.install_commands: list = self._get_install_commands()
+        self.version: str = "snap --version"
 
-    def _get_os_installer(self) -> str:
-        return "sudo apt-get"
-
-    def get_snapd_service_run_cmd(self):
-        return  ["sudo systemctl enable --now snapd", "sudo systemctl start snapd"]
+    def _get_install_commands(self) -> list:
+        return self.commands.get(f"{self._host.os} {self._host.release}", [])

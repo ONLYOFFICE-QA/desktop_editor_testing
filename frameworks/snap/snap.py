@@ -15,27 +15,8 @@ class Snap:
             return print(f"[cyan]|INFO| Snap already installed")
 
         print('[cyan] installing snap...')
-        self.update_os_dependencies()
-        self.install_snap_dependencies()
-        self.install_snapd()
-        self.run_snapd_service()
-        self.install_snap_core()
-
-    def run_snapd_service(self):
-        for cmd in self.cmd.run_snapd_service:
-            self._run_cmd(cmd)
-
-    def install_snapd(self):
-        self._run_cmd(self.cmd.install_snapd)
-
-    def install_snap_core(self):
-        self._run_cmd(self.cmd.snap_core)
-
-    def install_snap_dependencies(self):
-        self._run_cmd(f"{self.cmd.installer} install -y sudo coreutils")
-
-    def update_os_dependencies(self):
-        self._run_cmd(f"{self.cmd.installer} update")
+        for command in self.cmd.install_commands:
+            self._run_cmd(command)
 
     def is_installed(self) -> bool:
         return self.out_snap_version() == 0
