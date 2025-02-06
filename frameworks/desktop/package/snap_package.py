@@ -11,6 +11,9 @@ class SnapPackege:
 
     def install(self) -> None:
         self.snap.install()
+        self.install_snap_package()
+
+    def install_snap_package(self) -> None:
         self._run_cmd(self._get_install_cmd())
 
     @staticmethod
