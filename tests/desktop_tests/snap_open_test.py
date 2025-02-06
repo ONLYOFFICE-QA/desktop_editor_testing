@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from frameworks.test_exceptions import TestException
+from rich import print
 from ..tools import TestData, TestTools
 
 

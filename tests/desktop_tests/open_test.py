@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from frameworks.host_control import HostInfo
+from rich import print
 from ..tools import TestTools, TestData
 
 
