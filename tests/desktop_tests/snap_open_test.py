@@ -10,6 +10,7 @@ class SnapOpenTest:
         self.test_tools = TestTools(test_data=self.data)
 
     def run(self):
+        print(f"[green]|INFO| Snap package test running...")
         self.install_desktop()
         self.test_tools.check_correct_version()
         self.test_tools.check_open_desktop()
