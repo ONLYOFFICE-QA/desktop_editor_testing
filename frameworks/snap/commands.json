@@ -6,6 +6,7 @@
     "inno": ["windows"]
   },
   "rhel": [
+    "sudo yum update -y",
     "sudo yum install epel-release -y",
     "sudo yum install snapd -y",
     "sudo systemctl enable --now snapd.socket",
