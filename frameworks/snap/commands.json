@@ -1,7 +1,7 @@
 {
   "os_family": {
-    "debian": ["debian 10", "ubuntu", "linuxmint", "pop"],
-    "rhel": ["centos 7", "redos", "altlinux", "fedora"],
+    "debian": ["debian", "ubuntu", "linuxmint", "pop"],
+    "rhel": ["centos", "redos", "altlinux", "fedora"],
     "suse": ["opensuse"],
     "inno": ["windows"]
   },
