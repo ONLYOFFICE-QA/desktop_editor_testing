@@ -5,14 +5,16 @@
     "suse": ["opensuse"],
     "inno": ["windows"]
   },
+
   "rhel": [
-    "sudo yum update -y",
     "sudo yum install epel-release -y",
     "sudo yum install snapd -y",
     "sudo systemctl enable --now snapd.socket",
+    "sudo systemctl enable snapd",
     "sudo ln -s /var/lib/snapd/snap /snap",
     "sudo systemctl restart snapd"
   ],
+
   "debian": [
     "sudo apt-get update",
     "sudo apt-get install -y sudo coreutils",
