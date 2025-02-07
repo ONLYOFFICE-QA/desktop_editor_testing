@@ -12,11 +12,8 @@ class SnapCommands:
         self.commands: dict = FileUtils.read_json(join(dirname(realpath(__file__)), 'commands.json'))
         self._host = HostInfo()
         self.host_name = self._host.name().lower()
-        self.install_commands: list = self._get_install_commands()
+        self.install_commands: list = self.commands.get(self._get_os_family(), [])
         self.version: str = "snap --version"
-
-    def _get_install_commands(self) -> list:
-        return self.commands.get(self._get_os_family(), [])
 
     def _get_os_family(self) -> str:
         for os_family, distributions in self.commands['os_family'].items():
