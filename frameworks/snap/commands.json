@@ -1,12 +1,18 @@
 {
-  "centos 7": [
+  "os_family": {
+    "debian": ["debian 10", "ubuntu", "linuxmint", "pop"],
+    "rhel": ["centos 7", "redos", "altlinux", "fedora"],
+    "suse": ["opensuse"],
+    "inno": ["windows"]
+  },
+  "rhel": [
     "sudo yum install epel-release -y",
     "sudo yum install snapd -y",
     "sudo systemctl enable --now snapd.socket",
     "sudo ln -s /var/lib/snapd/snap /snap",
     "sudo systemctl restart snapd"
   ],
-  "debian 10": [
+  "debian": [
     "sudo apt-get update",
     "sudo apt-get install -y sudo coreutils",
     "sudo apt-get install -y snapd",
