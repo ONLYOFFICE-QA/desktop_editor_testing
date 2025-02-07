@@ -5,19 +5,23 @@
       "ubuntu",
       "pop"
     ],
+
     "rhel": [
       "centos",
       "redos",
       "altlinux",
       "fedora"
     ],
+
     "suse": [
       "opensuse"
     ],
+
     "linuxmint": [
       "linuxmint"
     ]
   },
+
   "rhel": [
     "sudo yum install epel-release -y",
     "sudo yum install snapd -y",
@@ -26,6 +30,7 @@
     "sudo ln -s /var/lib/snapd/snap /snap",
     "sudo systemctl restart snapd"
   ],
+
   "debian": [
     "sudo apt-get update",
     "sudo apt-get install -y sudo coreutils",
@@ -34,6 +39,7 @@
     "sudo systemctl start snapd",
     "sudo snap install core"
   ],
+
   "linuxmint": [
     "sudo mv /etc/apt/preferences.d/nosnap.pref ~/nosnap.pref.backup",
     "sudo apt-get update",
@@ -43,6 +49,7 @@
     "sudo systemctl start snapd",
     "sudo snap install core"
   ],
+
   "suse": [
     "sudo zypper --non-interactive addrepo --refresh https://download.opensuse.org/repositories/system:/snappy/openSUSE_Leap_15.5 snappy",
     "sudo zypper --non-interactive install snapd",
