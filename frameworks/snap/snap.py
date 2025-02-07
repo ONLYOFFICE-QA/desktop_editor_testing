@@ -2,7 +2,7 @@
 from subprocess import call, getoutput
 from rich import print
 
-from .commands import SnapCommands
+from .snap_commands import SnapCommands
 
 
 class Snap:

@@ -9,7 +9,7 @@ from frameworks.host_control import FileUtils, HostInfo
 class SnapCommands:
 
     def __post_init__(self):
-        self.commands: dict = FileUtils.read_json(join(dirname(realpath(__file__)), 'commands.json'))
+        self.commands: dict = FileUtils.read_json(join(dirname(realpath(__file__)), 'install_commands.json'))
         self._host = HostInfo()
         self.host_name = self._host.name().lower()
         self.install_commands: list = self.commands.get(self._get_os_family(), [])
