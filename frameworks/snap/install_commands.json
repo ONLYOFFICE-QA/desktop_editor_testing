@@ -51,8 +51,8 @@
   ],
 
   "suse": [
-    "sudo zypper --non-interactive addrepo --refresh https://download.opensuse.org/repositories/system:/snappy/openSUSE_Leap_15.5 snappy",
-    "sudo zypper --non-interactive install snapd",
+    "sudo zypper addrepo --refresh https://download.opensuse.org/repositories/system:/snappy/openSUSE_Leap_15.5 snappy",
+    "sudo zypper --non-interactive --gpg-auto-import-keys install snapd",
     "sudo systemctl enable --now snapd"
   ]
 }

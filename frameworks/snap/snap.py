@@ -18,7 +18,7 @@ class Snap:
 
             return print(f"[cyan]|INFO| Snap already installed and running")
 
-        print('[cyan] installing snap...')
+        print('|INFO|[green] installing snap...')
         for command in self.cmd.install_commands:
             self._run_cmd(command)
 
