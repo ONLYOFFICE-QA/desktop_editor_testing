@@ -5,6 +5,7 @@ from frameworks.snap import Snap
 
 
 class SnapPackege:
+    install_onlyoffice_snap_cmd = "sudo snap install --beta onlyoffice-desktopeditors"
 
     def __init__(self):
         self.snap = Snap()
@@ -14,11 +15,7 @@ class SnapPackege:
         self.install_snap_package()
 
     def install_snap_package(self) -> None:
-        self._run_cmd(self._get_install_cmd())
-
-    @staticmethod
-    def _get_install_cmd() -> str:
-        return "sudo snap install --beta onlyoffice-desktopeditors"
+        self._run_cmd(self.install_onlyoffice_snap_cmd)
 
     def _run_cmd(self, cmd: str) -> int:
         return call(cmd, shell=True)
