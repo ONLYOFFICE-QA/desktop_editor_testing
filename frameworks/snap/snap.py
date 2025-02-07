@@ -16,7 +16,7 @@ class Snap:
                 print("[cyan]|INFO| Start snapd service")
                 self.start_snapd_service()
 
-            return print(f"[cyan]|INFO| Snap already installed")
+            return print(f"[cyan]|INFO| Snap already installed and running")
 
         print('[cyan] installing snap...')
         for command in self.cmd.install_commands:
