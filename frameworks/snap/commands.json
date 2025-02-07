@@ -2,8 +2,7 @@
   "os_family": {
     "debian": ["debian", "ubuntu", "linuxmint", "pop"],
     "rhel": ["centos", "redos", "altlinux", "fedora"],
-    "suse": ["opensuse"],
-    "inno": ["windows"]
+    "suse": ["opensuse"]
   },
 
   "rhel": [
