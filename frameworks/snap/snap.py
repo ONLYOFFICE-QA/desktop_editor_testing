@@ -3,6 +3,7 @@ from subprocess import call, getoutput
 from rich import print
 
 from .snap_commands import SnapCommands
+from ..decorators import retry
 from ..test_exceptions import TestException
 
 
@@ -13,6 +14,7 @@ class Snap:
     def __init__(self):
         self.cmd = SnapCommands()
 
+    @retry(max_attempts=3, interval=2)
     def install(self):
         if self.is_installed():
             if not self.snapd_service_id_active():
