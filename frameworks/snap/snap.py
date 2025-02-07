@@ -3,7 +3,10 @@ from subprocess import call, getoutput
 from rich import print
 
 from .snap_commands import SnapCommands
+from ..test_exceptions import TestException
 
+
+class SnapException(TestException): ...
 
 class Snap:
 
@@ -21,6 +24,9 @@ class Snap:
         print('|INFO|[green] installing snap...')
         for command in self.cmd.install_commands:
             self._run_cmd(command)
+
+        if not self.is_installed() and not self.snapd_service_id_active():
+            raise SnapException("Failed install snap..")
 
     def is_installed(self) -> bool:
         return self.out_snap_version() == 0
