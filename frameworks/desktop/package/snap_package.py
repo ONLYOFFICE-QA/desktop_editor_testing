@@ -17,5 +17,6 @@ class SnapPackege:
     def install_snap_package(self) -> None:
         self._run_cmd(self.install_onlyoffice_snap_cmd)
 
-    def _run_cmd(self, cmd: str) -> int:
+    @staticmethod
+    def _run_cmd(cmd: str) -> int:
         return call(cmd, shell=True)
