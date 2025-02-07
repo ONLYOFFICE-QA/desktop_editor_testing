@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from subprocess import call
+from subprocess import call, getoutput
 from rich import print
 
 from .commands import SnapCommands
@@ -12,6 +12,10 @@ class Snap:
 
     def install(self):
         if self.is_installed():
+            if not self.snapd_service_id_active():
+                print("[cyan]|INFO| Start snapd service")
+                self.start_snapd_service()
+
             return print(f"[cyan]|INFO| Snap already installed")
 
         print('[cyan] installing snap...')
@@ -24,6 +28,16 @@ class Snap:
     def out_snap_version(self) -> int:
         return self._run_cmd(self.cmd.version)
 
+    def snapd_service_id_active(self) -> bool:
+        return self._get_output("systemctl is-active snapd").lower() == 'active'
+
+    def start_snapd_service(self) -> None:
+        self._run_cmd("sudo systemctl start snapd")
+
     @staticmethod
     def _run_cmd(cmd: str) -> int:
         return call(cmd, shell=True)
+
+    @staticmethod
+    def _get_output(cmd: str) -> str:
+        return getoutput(cmd)
