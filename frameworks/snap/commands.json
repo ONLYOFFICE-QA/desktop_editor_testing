@@ -1,10 +1,23 @@
 {
   "os_family": {
-    "debian": ["debian", "ubuntu", "linuxmint", "pop"],
-    "rhel": ["centos", "redos", "altlinux", "fedora"],
-    "suse": ["opensuse"]
+    "debian": [
+      "debian",
+      "ubuntu",
+      "pop"
+    ],
+    "rhel": [
+      "centos",
+      "redos",
+      "altlinux",
+      "fedora"
+    ],
+    "suse": [
+      "opensuse"
+    ],
+    "linuxmint": [
+      "linuxmint"
+    ]
   },
-
   "rhel": [
     "sudo yum install epel-release -y",
     "sudo yum install snapd -y",
@@ -13,8 +26,17 @@
     "sudo ln -s /var/lib/snapd/snap /snap",
     "sudo systemctl restart snapd"
   ],
-
   "debian": [
+    "sudo apt-get update",
+    "sudo apt-get install -y sudo coreutils",
+    "sudo apt-get install -y snapd",
+    "sudo systemctl enable --now snapd",
+    "sudo systemctl start snapd",
+    "sudo snap install core"
+  ],
+
+  "linuxmint": [
+    "sudo mv /etc/apt/preferences.d/nosnap.pref ~/nosnap.pref.backup",
     "sudo apt-get update",
     "sudo apt-get install -y sudo coreutils",
     "sudo apt-get install -y snapd",
