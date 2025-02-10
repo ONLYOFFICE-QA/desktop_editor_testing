@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from frameworks.snap.snap import SnapException
 from frameworks.test_exceptions import TestException
 from rich import print
 from ..tools import TestData, TestTools
@@ -23,7 +24,10 @@ class SnapOpenTest:
         if self.test_tools.is_windows:
             raise TestException("Unable to install snap package on windows")
 
-        self.test_tools.desktop.snap_package.install()
+        try:
+            self.test_tools.desktop.snap_package.install()
+        except SnapException:
+            self.test_tools.write_results("SNAP INSTALL ERROR")
 
     def update_desktop(self) -> None:
         raise TestException("The snap packege update is not supported")
