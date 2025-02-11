@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from os.path import dirname, realpath
+from os.path import dirname, realpath, join
 import re
 from subprocess import call
 
@@ -13,7 +13,7 @@ from frameworks.test_exceptions import AppImageException
 
 
 class AppImage:
-    repo_config = FileUtils.read_json(dirname(realpath(__file__)), "appimage_repo_config.json")
+    repo_config = FileUtils.read_json(join(dirname(realpath(__file__)), "appimage_repo_config.json"))
     version_pattern = r"(\d+\.\d+\.\d+-\d+)"
 
     def __init__(self, data: Data):
