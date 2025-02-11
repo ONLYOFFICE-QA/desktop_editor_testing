@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from os.path import dirname, realpath
+from os.path import dirname, realpath, join
 from subprocess import call
 
 from frameworks.host_control import FileUtils
