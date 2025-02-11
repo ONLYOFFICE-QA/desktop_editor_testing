@@ -76,7 +76,7 @@ class DesktopEditor:
 
     def _generate_running_command(self):
         if self.data.appimage_package:
-            return self.appimage.download_path
+            return self.appimage.appimage_path
 
         run_cmd = self.config.get(self._get_run_command_key(), None)
         if run_cmd:
