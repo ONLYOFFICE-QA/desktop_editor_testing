@@ -118,7 +118,7 @@ class DesktopEditor:
                     console.print(f"[cyan]|INFO| {output}")
                     if wait_msg in output:
                         self.create_log_file()
-                    return True
+                        return True
             return False
 
         except PermissionError:
