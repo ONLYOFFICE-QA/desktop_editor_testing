@@ -22,13 +22,13 @@ class AppImage:
         self.api = GitHubApi(repo_owner=self.repo_config['repo_owner'], repo_name=self.repo_config['repo_name'])
         self.version_handler = VersionHandler(version=self.data.version)
         self.find_version = f"{self.version_handler.without_build}-{self.version_handler.build}"
-        self.appimage_path = None
+        self.path = None
 
     def get(self) -> None:
         archive_path = self.download_appimage(artifact=self._get_artifact())
         execute_dir = self.unpacking_appimage_archive(archive_path=archive_path)
-        self.appimage_path = self.find_appimage_path(appimage_dir=execute_dir)
-        self._run_cmd(f"chmod +x {self.appimage_path}")
+        self.path = self.find_appimage_path(appimage_dir=execute_dir)
+        self._run_cmd(f"chmod +x {self.path}")
 
     def download_appimage(self, artifact: dict) -> str:
         print(f"[green]|INFO| Downloading AppImage: {artifact['name']}")
