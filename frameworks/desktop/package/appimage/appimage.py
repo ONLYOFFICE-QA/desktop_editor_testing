@@ -64,7 +64,7 @@ class AppImage:
 
     def _get_workflow_id(self) -> str:
         for workflow in self.api.workflow.get():
-            if workflow.get('name', '') == "Build APPIMAGE package":
+            if workflow.get('name', '').lower() == "Build APPIMAGE package".lower():
                 return workflow["id"]
 
         raise AppImageException(f"[bold red]|ERROR| Can't get workflow id: {self.api.host}")
