@@ -25,14 +25,21 @@ class DesktopEditor:
         self.debug_command = '--ascdesktop-support-debug-info'
         self.log_out_cmd = self._get_log_out_cmd()
 
-    def open(self, file_path: str = None, debug_mode: bool = False, log_out_mode: bool = False) -> Popen:
+    def open(
+            self,
+            file_path: str = None,
+            debug_mode: bool = False,
+            log_out_mode: bool = False,
+            stdout: bool = True
+    ) -> Popen:
         command = (
             f"{self._generate_running_command()}"
             f"{(' ' + self.log_out_cmd) if log_out_mode else ''}"
             f"{(' ' + self.debug_command) if debug_mode else ''}"
             f"{(' ' + file_path) if file_path else ''}".strip()
         )
-        print(f"[green]|INFO| Open Desktop Editor via command: {command}")
+        if stdout:
+            print(f"[green]|INFO| Open Desktop Editor via command: [cyan]{command}[/]")
         return Popen(command, stdout=PIPE, stderr=PIPE, shell=True)
 
     def wait_until_open(
