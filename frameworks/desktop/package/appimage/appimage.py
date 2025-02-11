@@ -2,9 +2,9 @@
 import re
 from os.path import dirname, realpath, join
 from subprocess import call
-from rich import print
+from typing import Optional
 
-from typing_extensions import Optional
+from rich import print
 
 from frameworks.desktop.data import Data
 from frameworks.desktop.handlers.VersionHandler import VersionHandler
