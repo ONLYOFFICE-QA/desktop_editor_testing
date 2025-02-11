@@ -8,10 +8,8 @@ from frameworks.test_exceptions import DesktopException
 from rich import print
 from rich.console import Console
 
-from .package import Package
+from .package import Package, AppImage, SnapPackege
 from .data import Data
-from .package.appimage import AppImage
-from .package.snap_package import SnapPackege
 
 console = Console()
 
