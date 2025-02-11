@@ -17,7 +17,7 @@ class Package:
         self.url: str =  self.url_generator.url
         self.name: str = self.url_generator.package_name
         self.version: str = data.version
-        self.download_dir: str = data.cache_dir if data.cache_dir else data.tmp_dir
+        self.download_dir: str = data.cache_dir or data.tmp_dir
         self.path: str = join(self.download_dir, self.name)
         FileUtils.create_dir(self.download_dir, stdout=False)
 

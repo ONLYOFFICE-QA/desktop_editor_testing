@@ -11,5 +11,5 @@ class Artifacts:
     def get(self, run_id: str) -> list:
         return self.request.get(f"{self.host_url}/actions/runs/{run_id}/artifacts").get("artifacts", [])
 
-    def downloads(self, artifact_url: str, output_dir_path: str) -> None:
-        self.request.download(artifact_url, output_dir_path)
+    def downloads(self, artifact_url: str, output_dir: str, file_name: str = None) -> str:
+        return self.request.download(url=artifact_url, dir_path=output_dir, name=file_name)

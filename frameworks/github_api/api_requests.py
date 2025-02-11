@@ -34,7 +34,7 @@ class ApiReqeust:
             stdout: bool = True,
             stderr: bool = True,
             chunk_size: int = 1024 * 1024
-    ) -> None:
+    ) -> str:
         """
         :param chunk_size:
         :param url: download link
@@ -64,3 +64,5 @@ class ApiReqeust:
 
         if stderr and int(getsize(_path)) != int(request.headers['Content-Length']):
             print(f"[red]|WARNING| Size different\nFile:{getsize(_path)}\nServer:{request.headers['Content-Length']}")
+
+        return _path

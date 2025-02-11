@@ -10,6 +10,7 @@ from rich.console import Console
 
 from .package import Package
 from .data import Data
+from .package.appimage import AppImage
 from .package.snap_package import SnapPackege
 
 console = Console()
@@ -21,6 +22,7 @@ class DesktopEditor:
         self.config = self._get_config(data.custom_config_path)
         self.package = Package(data)
         self.snap_package = SnapPackege()
+        self.appimage = AppImage(data=self.data)
         self.os = HostInfo().os
         self.tmp_dir = data.tmp_dir
         self.log_file = FileUtils.unique_name(self.tmp_dir, extension='txt')
@@ -75,6 +77,9 @@ class DesktopEditor:
             return print(f"[green]|INFO| Desktop activated")
 
     def _generate_running_command(self):
+        if self.data.appimage_package:
+            return self.appimage.download_path
+
         run_cmd = self.config.get(self._get_run_command_key(), None)
         if run_cmd:
             return run_cmd

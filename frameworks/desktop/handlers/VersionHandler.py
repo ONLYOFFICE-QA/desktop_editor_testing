@@ -8,7 +8,7 @@ class VersionHandler:
     Class for handling version numbers like “00.00.00.00”.
     Provides functionality to parse version numbers and extract major, minor and build components.
     Attributes:
-        _version_pattern (str): Regular expression pattern to match version numbers.
+        version_pattern (str): Regular expression pattern to match version numbers.
         Version (str): Version number string.
     """
 
@@ -17,7 +17,7 @@ class VersionHandler:
         Initializes the VersionHandler object.
         :param version: Version number string.
         """
-        self._version_pattern = r'(\d+).(\d+).(\d+).(\d+)'
+        self.version_pattern = r'(\d+).(\d+).(\d+).(\d+)'
         self.version = version
 
     @property
@@ -48,7 +48,7 @@ class VersionHandler:
         Extracts the major version component from the version number.
         :return: Major version string.
         """
-        return sub(self._version_pattern, r'\1.\2', self.version)
+        return sub(self.version_pattern, r'\1.\2', self.version)
 
     @property
     def minor(self) -> str:
@@ -56,7 +56,7 @@ class VersionHandler:
         Extracts the minor version component from the version number.
         :return: Minor version string.
         """
-        return sub(self._version_pattern, r'\3', self.version)
+        return sub(self.version_pattern, r'\3', self.version)
 
     @property
     def build(self) -> int:
@@ -64,7 +64,7 @@ class VersionHandler:
         Extracts the build number component from the version number.
         :return: Build number integer.
         """
-        return int(sub(self._version_pattern, r'\4', self.version))
+        return int(sub(self.version_pattern, r'\4', self.version))
 
     @property
     def without_build(self) -> str:
