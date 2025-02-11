@@ -38,8 +38,10 @@ class DesktopEditor:
             f"{(' ' + self.debug_command) if debug_mode else ''}"
             f"{(' ' + file_path) if file_path else ''}".strip()
         )
+
         if stdout:
             print(f"[green]|INFO| Open Desktop Editor via command: [cyan]{command}[/]")
+
         return Popen(command, stdout=PIPE, stderr=PIPE, shell=True)
 
     def wait_until_open(
