@@ -22,9 +22,6 @@ class DesktopEditor:
         self.snap_package = SnapPackege()
         self.appimage = AppImage(data=self.data)
         self.os = HostInfo().os
-        self.tmp_dir = data.tmp_dir
-        self.log_file = FileUtils.unique_name(self.tmp_dir, extension='txt')
-        self.create_log_file()
         self.debug_command = '--ascdesktop-support-debug-info'
         self.log_out_cmd = self._get_log_out_cmd()
 
@@ -35,6 +32,7 @@ class DesktopEditor:
             f"{(' ' + self.debug_command) if debug_mode else ''}"
             f"{(' ' + file_path) if file_path else ''}".strip()
         )
+        print(f"[green]|INFO| Open Desktop Editor via command: {command}")
         return Popen(command, stdout=PIPE, stderr=PIPE, shell=True)
 
     def wait_until_open(
@@ -101,8 +99,13 @@ class DesktopEditor:
         return FileUtils.read_json(config_path)
 
     def _get_log_out_cmd(self) -> str:
-        log = self.log_file if HostInfo().release in  ['vista', 'xp'] else 'stdout'
-        return f'--ascdesktop-log-file="{log}"'
+        if HostInfo().release in self.config.get('old_windows_system', []):
+            self.log_file = FileUtils.unique_name(self.data.tmp_dir, extension='txt')
+            self.create_log_file()
+        else:
+            self.log_file = 'stdout'
+
+        return f'--ascdesktop-log-file="{self.log_file}"'
 
     @staticmethod
     def _check_in_output(wait_msg: str, stdout_process: Popen) -> bool:
@@ -110,6 +113,7 @@ class DesktopEditor:
         if output:
             console.print(f"[cyan]|INFO| {output}")
             return wait_msg in output
+        return False
 
     def _check_in_log_file(self, wait_msg: str) -> bool:
         try:
