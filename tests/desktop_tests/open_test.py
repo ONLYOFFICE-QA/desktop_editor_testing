@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from frameworks.host_control import HostInfo
+from rich import print
 from ..tools import TestTools, TestData
 
 
@@ -10,6 +11,7 @@ class OpenTest:
         self.test_tools = TestTools(test_data=self.data)
 
     def run(self):
+        print(f"[green]|INFO| Open test is running...")
         self.update_desktop() if self.test_tools.old_desktop else self.install_desktop()
         self.test_tools.check_installed()
         self.test_tools.check_correct_version()

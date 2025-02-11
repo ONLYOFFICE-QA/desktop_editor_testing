@@ -10,6 +10,7 @@ from rich.console import Console
 
 from .package import Package
 from .data import Data
+from .package.snap_package import SnapPackege
 
 console = Console()
 
@@ -19,6 +20,7 @@ class DesktopEditor:
         self.lic_file_path = data.lic_file
         self.config = self._get_config(data.custom_config_path)
         self.package = Package(data)
+        self.snap_package = SnapPackege()
         self.os = HostInfo().os
         self.tmp_dir = data.tmp_dir
         self.log_file = FileUtils.unique_name(self.tmp_dir, extension='txt')
@@ -73,10 +75,16 @@ class DesktopEditor:
             return print(f"[green]|INFO| Desktop activated")
 
     def _generate_running_command(self):
-        run_cmd = self.config.get(f'{HostInfo().os}_run_command', None)
+        run_cmd = self.config.get(self._get_run_command_key(), None)
         if run_cmd:
             return run_cmd
         raise ValueError(f"[red]|ERROR| Can't get running command, key: {HostInfo().os}_run_command")
+
+    def _get_run_command_key(self):
+        if self.data.snap_package:
+            return 'snap_run_command'
+
+        return f'{HostInfo().os}_run_command'
 
     def _generate_get_version_cmd(self) -> str:
         if self.os.lower() == 'windows':

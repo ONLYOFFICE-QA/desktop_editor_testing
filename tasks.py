@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from invoke import task
 
-from tests import OpenTest, TestTools, TestData
+from tests import OpenTest, SnapOpenTest, TestTools, TestData
 
 
 @task
@@ -12,7 +12,8 @@ def open_test(
         display: bool = False,
         config: str = None,
         telegram: bool = False,
-        license: str = None
+        license: str = None,
+        snap: bool = False
 ):
     config = TestData(
         version=version,
@@ -20,10 +21,14 @@ def open_test(
         virtual_display=display,
         custom_config=config if config else None,
         telegram=telegram,
-        license_file_path=license
+        license_file_path=license,
+        snap=snap
     )
 
-    OpenTest(test_data=config).run()
+    if snap:
+        SnapOpenTest(test_data=config).run()
+    else:
+        OpenTest(test_data=config).run()
 
 
 @task
