@@ -49,7 +49,7 @@ class TestTools:
                 continue
 
             print(f"[green]|INFO| Test opening file: {basename(file)}")
-            self.desktop.open(file, log_out_mode=True)
+            self.desktop.open(file, log_out_mode=True, stdout=False)
             time.sleep(15)  # TODO
             self._close_warning_window()
             self.check_error_on_screen()

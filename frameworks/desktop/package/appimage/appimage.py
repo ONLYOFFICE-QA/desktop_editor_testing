@@ -58,7 +58,7 @@ class AppImage:
 
         raise AppImageException(f"|ERROR| Can't found appimage path from: {appimage_dir} ")
 
-    def _get_artifact(self):
+    def _get_artifact(self) -> Optional[dict]:
         for run in self.api.workflow.get_runs(workflow_id=self._get_workflow_id()):
             artifacts = self.api.artifacts.get(run_id=run["id"])
             for artifact in artifacts:
