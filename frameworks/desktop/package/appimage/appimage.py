@@ -10,7 +10,7 @@ from frameworks.decorators import retry
 from frameworks.desktop.data import Data
 from frameworks.desktop.handlers.VersionHandler import VersionHandler
 from frameworks.github_api import GitHubApi
-from frameworks.host_control import FileUtils
+from frameworks.host_control import FileUtils, HostInfo
 from frameworks.test_exceptions import AppImageException
 
 
@@ -26,10 +26,16 @@ class AppImage:
         self.path = None
 
     def get(self) -> None:
+        self._install_specific_dependencies()
         archive_path = self.download_appimage(artifact=self._get_artifact())
         execute_dir = self.unpacking_appimage_archive(archive_path=archive_path)
         self.path = self.find_appimage_path(appimage_dir=execute_dir)
         self._run_cmd(f"chmod +x {self.path}")
+
+    # TODO Bug 73165
+    def _install_specific_dependencies(self):
+        if f"{HostInfo().name().lower()} {HostInfo().version}" in ["pop 22.04", "ubuntu 24.04", "ubuntu 22.04"]:
+            self._run_cmd("sudo apt-get install libfuse2 -y")
 
     @retry(max_attempts=3, interval=1)
     def download_appimage(self, artifact: dict) -> str:
