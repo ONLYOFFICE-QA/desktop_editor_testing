@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 import re
-from os.path import dirname, realpath, join
+from os.path import dirname, realpath, join, getsize
 from subprocess import call
 from typing import Optional
 
 from rich import print
 
+from frameworks.decorators import retry
 from frameworks.desktop.data import Data
 from frameworks.desktop.handlers.VersionHandler import VersionHandler
 from frameworks.github_api import GitHubApi
@@ -30,6 +31,7 @@ class AppImage:
         self.path = self.find_appimage_path(appimage_dir=execute_dir)
         self._run_cmd(f"chmod +x {self.path}")
 
+    @retry(max_attempts=3, interval=1)
     def download_appimage(self, artifact: dict) -> str:
         print(f"[green]|INFO| Downloading AppImage: {artifact['name']}")
         download_path = self.api.artifacts.downloads(
@@ -37,6 +39,9 @@ class AppImage:
             output_dir=self.data.tmp_dir,
             file_name=f"{artifact['name']}.zip"
         )
+        if artifact['size_in_bytes'] != getsize(download_path):
+            raise AppImageException(f"Failed downloads appimage.")
+
         print(f"[green]|INFO| AppImage.zip downloaded to: {download_path}")
         return download_path
 
