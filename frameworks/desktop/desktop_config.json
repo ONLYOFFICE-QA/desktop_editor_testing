@@ -1,6 +1,7 @@
 {
   "linux_run_command": "onlyoffice-desktopeditors",
   "snap_run_command": "snap run onlyoffice-desktopeditors",
+  "flatpak_run_command": "flatpak run org.onlyoffice.desktopeditors",
   "mac_run_command": "/Applications/ONLYOFFICE.app/Contents/MacOS/ONLYOFFICE",
   "windows_run_command": "powershell.exe \"& 'C:\\Program Files\\ONLYOFFICE\\DesktopEditors\\DesktopEditors.exe'\"",
   "old_windows_system": ["vista", "xp"]

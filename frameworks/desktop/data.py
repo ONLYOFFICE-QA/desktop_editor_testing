@@ -12,3 +12,4 @@ class Data:
     lic_file: str = None
     snap_package: bool = False
     appimage_package: bool = False
+    flatpak_package: bool = False

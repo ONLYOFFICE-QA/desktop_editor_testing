@@ -12,13 +12,11 @@ from frameworks.image_handler import Image
 from frameworks.test_exceptions import TestException
 
 from .paths import Paths
-from .desktop_report import  DesktopReport
+from .desktop_report import DesktopReport
 from .test_data import TestData
 
 
-
 class TestTools:
-
 
     def __init__(self, test_data: TestData):
         self.data = test_data
@@ -53,7 +51,8 @@ class TestTools:
             time.sleep(15)  # TODO
             self._close_warning_window()
             self.check_error_on_screen()
-            Image.make_screenshot(f"{join(self.report.dir, f'{self.data.version}_{self.host_name}_{basename(file)}.png')}")
+            Image.make_screenshot(
+                f"{join(self.report.dir, f'{self.data.version}_{self.host_name}_{basename(file)}.png')}")
 
     def check_open_desktop(self, timeout: int = 30):
         try:
@@ -144,7 +143,8 @@ class TestTools:
                 lic_file=self.data.license_file_path,
                 cache_dir=self.data.cache_dir,
                 snap_package=self.data.snap,
-                appimage_package=self.data.appimage
+                appimage_package=self.data.appimage,
+                flatpak_package=self.data.flatpak
             )
         )
 

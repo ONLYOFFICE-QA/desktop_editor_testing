@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from invoke import task
-
-from tests import OpenTest, SnapOpenTest, TestTools, TestData
-from tests.desktop_tests.appimage_open_test import AppImageOpenTest
+from tests import OpenTest, SnapOpenTest, FlatPakOpenTest, AppImageOpenTest, TestTools, TestData
 
 
 @task
@@ -15,7 +13,8 @@ def open_test(
         telegram: bool = False,
         license: str = None,
         snap: bool = False,
-        appimage: bool = False
+        appimage: bool = False,
+        flatpak: bool = False
 ):
     config = TestData(
         version=version,
@@ -32,6 +31,8 @@ def open_test(
         SnapOpenTest(test_data=config).run()
     elif appimage:
         AppImageOpenTest(test_data=config).run()
+    elif flatpak:
+        FlatPakOpenTest(test_data=config)
     else:
         OpenTest(test_data=config).run()
 

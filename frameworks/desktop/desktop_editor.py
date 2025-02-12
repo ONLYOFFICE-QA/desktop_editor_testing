@@ -8,7 +8,7 @@ from frameworks.test_exceptions import DesktopException
 from rich import print
 from rich.console import Console
 
-from .package import Package, AppImage, SnapPackege
+from .package import Package, AppImage, SnapPackege, Flatpak
 from .data import Data
 
 console = Console()
@@ -20,6 +20,7 @@ class DesktopEditor:
         self.config = self._get_config(data.custom_config_path)
         self.package = Package(data)
         self.snap_package = SnapPackege()
+        self.flatpak_package = Flatpak()
         self.appimage = AppImage(data=self.data)
         self.os = HostInfo().os
         self.debug_command = '--ascdesktop-support-debug-info'
@@ -93,6 +94,9 @@ class DesktopEditor:
     def _get_run_command_key(self):
         if self.data.snap_package:
             return 'snap_run_command'
+
+        if self.data.flatpak_package:
+            return 'flatpak_run_command'
 
         return f'{HostInfo().os}_run_command'
 
