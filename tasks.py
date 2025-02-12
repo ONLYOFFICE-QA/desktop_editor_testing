@@ -2,6 +2,7 @@
 from invoke import task
 
 from tests import OpenTest, SnapOpenTest, TestTools, TestData
+from tests.desktop_tests.appimage_open_test import AppImageOpenTest
 
 
 @task
@@ -13,7 +14,8 @@ def open_test(
         config: str = None,
         telegram: bool = False,
         license: str = None,
-        snap: bool = False
+        snap: bool = False,
+        appimage: bool = False
 ):
     config = TestData(
         version=version,
@@ -22,11 +24,14 @@ def open_test(
         custom_config=config if config else None,
         telegram=telegram,
         license_file_path=license,
-        snap=snap
+        snap=snap,
+        appimage=appimage
     )
 
     if snap:
         SnapOpenTest(test_data=config).run()
+    elif appimage:
+        AppImageOpenTest(test_data=config).run()
     else:
         OpenTest(test_data=config).run()
 

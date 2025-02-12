@@ -18,6 +18,7 @@ class TestData:
     path: Paths = Paths()
     license_file_path: str = join(path.test_assets, 'test_lic.lickey')
     snap: bool = False
+    appimage: bool = False
 
     def __post_init__(self):
         self.config: json = self._read_config()

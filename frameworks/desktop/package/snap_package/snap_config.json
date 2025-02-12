@@ -1,0 +1,3 @@
+{
+  "install_snap_cmd": "sudo snap install --beta onlyoffice-desktopeditors"
+}

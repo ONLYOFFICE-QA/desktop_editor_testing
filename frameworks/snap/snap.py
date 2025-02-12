@@ -4,10 +4,8 @@ from rich import print
 
 from .snap_commands import SnapCommands
 from ..decorators import retry
-from ..test_exceptions import TestException
+from ..test_exceptions import SnapException
 
-
-class SnapException(TestException): ...
 
 class Snap:
 

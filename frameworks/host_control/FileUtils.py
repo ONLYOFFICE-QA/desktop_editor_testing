@@ -6,6 +6,7 @@ from random import randint
 from shutil import copyfile
 from subprocess import getoutput, Popen, PIPE
 from codecs import open as codecs_open
+from zipfile import ZipFile
 
 from requests import get, head
 from rich import print
@@ -177,3 +178,14 @@ class FileUtils:
                 file_paths.append(join(root, filename))
 
         return file_paths
+
+    @staticmethod
+    def unpacking_zip(archive_path: str, execute_path: str, stdout: bool = False) -> str:
+        if stdout:
+            print(f'[green]|INFO| Unpacking via ZipFile: [cyan]{basename(archive_path)}[/] to [cyan]{execute_path}[/]')
+
+        with ZipFile(archive_path) as archive:
+            archive.extractall(execute_path)
+
+        print(f'[green]|INFO| Unpack Completed to: {execute_path}') if stdout else None
+        return execute_path
