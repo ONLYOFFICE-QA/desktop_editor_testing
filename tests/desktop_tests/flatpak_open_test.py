@@ -22,7 +22,7 @@ class FlatPakOpenTest:
 
     def install_desktop(self):
         if self.test_tools.is_windows:
-            raise TestException("Unable to install snap package on windows")
+            raise TestException("Unable to install flatpak package on windows")
 
         try:
             self.test_tools.desktop.flatpak_package.install()
