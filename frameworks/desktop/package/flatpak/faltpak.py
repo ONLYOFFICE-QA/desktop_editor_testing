@@ -17,7 +17,7 @@ class Flatpak:
         self.pr = PullRequest(repo_name=self.config['repo_name'], pull_num=self.config["pull_num"])
 
     def install(self) -> None:
-        self._run_cmd(self._get_last_build_install_cmd())
+        self._run_cmd(f"{self._get_last_build_install_cmd()} -y")
 
     def _get_last_build_install_cmd(self) -> Optional[str]:
         newest_comment = max(self._get_filtered_comments(), key=lambda c: c["created_at"])
