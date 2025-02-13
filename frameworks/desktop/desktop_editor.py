@@ -19,7 +19,6 @@ class DesktopEditor:
         self.lic_file_path = data.license_file_path
         self.config = self._get_config(data.custom_config)
         self.package = self._get_package()
-        self.appimage = AppImage(data=self.data)
         self.os = HostInfo().os
         self.debug_command = '--ascdesktop-support-debug-info'
         self.log_out_cmd = self._get_log_out_cmd()
@@ -82,10 +81,13 @@ class DesktopEditor:
 
     def _generate_running_command(self):
         def raise_command_error():
-            raise ValueError(f"[red]|ERROR| Can't get running command, key: {HostInfo().os}_run_command")
+            raise DesktopException(f"|ERROR| Can't get running command, key: {HostInfo().os}_run_command")
 
         if self.data.appimage_package:
-            return self.appimage.path
+            if self.package.path and isfile(self.package.path):
+                return self.package.path
+
+            raise DesktopException("|ERROR| Appimage not found")
 
         return self.config.get(self._get_run_command_key()) or raise_command_error()
 
