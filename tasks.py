@@ -24,7 +24,8 @@ def open_test(
         telegram=telegram,
         license_file_path=license,
         snap=snap,
-        appimage=appimage
+        appimage=appimage,
+        flatpak=flatpak
     )
 
     if snap:
