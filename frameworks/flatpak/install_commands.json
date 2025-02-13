@@ -3,26 +3,10 @@
     "debian": [
       "debian",
       "ubuntu",
-      "pop"
-    ],
-
-    "rhel": [
-      "centos",
-      "redos",
-      "altlinux",
-      "fedora"
-    ],
-
-    "suse": [
-      "opensuse"
-    ],
-
-    "linuxmint": [
+      "pop",
+      "linuxmint"
     ]
   },
-
-  "rhel": [
-  ],
 
   "debian": [
     "sudo apt update",
@@ -36,9 +20,4 @@
     "sudo apt-get install flatpak -y"
   ],
 
-  "linuxmint": [
-  ],
-
-  "suse": [
-  ]
 }
