@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from re import sub
-from rich import print
 
 
 class VersionHandler:
