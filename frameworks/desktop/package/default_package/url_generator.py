@@ -4,7 +4,8 @@ from rich import print
 
 from frameworks.host_control import HostInfo, FileUtils
 from frameworks.desktop.handlers.VersionHandler import VersionHandler
-from frameworks.desktop.data import Data
+
+from ...data import Data
 
 class UrlException(Exception): ...
 
