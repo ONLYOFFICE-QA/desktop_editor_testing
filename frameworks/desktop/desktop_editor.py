@@ -8,7 +8,7 @@ from frameworks.test_exceptions import DesktopException
 from rich import print
 from rich.console import Console
 
-from .package import DefaultPackage, AppImage, SnapPackege, Flatpak
+from .package import DefaultPackage, AppImage, SnapPackage, Flatpak
 from .data import Data
 
 console = Console()
@@ -121,14 +121,17 @@ class DesktopEditor:
         return False
 
     def _get_package(self):
-        if self.data.flatpak_package:
-            return Flatpak()
-        elif self.data.snap_package:
-            return SnapPackege()
-        elif self.data.appimage_package:
-            return AppImage(data=self.data)
-        else:
-            return DefaultPackage(data=self.data)
+        package_map = {
+            "flatpak_package": Flatpak,
+            "snap_package": SnapPackage,
+            "appimage_package": lambda: AppImage(data=self.data),
+        }
+
+        for attr, package_class in package_map.items():
+            if getattr(self.data, attr):
+                return package_class() if not callable(package_class) else package_class()
+
+        return DefaultPackage(data=self.data)
 
     def _check_in_log_file(self, wait_msg: str) -> bool:
         try:

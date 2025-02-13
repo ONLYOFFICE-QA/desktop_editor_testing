@@ -7,7 +7,7 @@ from frameworks.snap import Snap
 from ..package import Package
 
 
-class SnapPackege(Package):
+class SnapPackage(Package):
     config = FileUtils.read_json(join(dirname(realpath(__file__)), "snap_config.json"))
 
     def __init__(self):
