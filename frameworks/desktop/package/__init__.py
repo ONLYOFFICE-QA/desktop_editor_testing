@@ -4,4 +4,4 @@ from .url_generator import UrlException
 from .package import PackageException
 from .snap_package import SnapPackege
 from .appimage import AppImage
-from .flatpak import Flatpak
+from .flatpak_package import Flatpak

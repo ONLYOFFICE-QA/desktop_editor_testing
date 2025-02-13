@@ -4,6 +4,7 @@ from re import search
 from subprocess import call
 from typing import Optional
 
+from frameworks.flatpak import FlatPakInstaller
 from frameworks.github_api import PullRequest
 from frameworks.host_control import FileUtils
 from frameworks.test_exceptions import FlatPakException
@@ -15,8 +16,10 @@ class Flatpak:
 
     def __init__(self):
         self.pr = PullRequest(repo_name=self.config['repo_name'], pull_num=self.config["pull_num"])
+        self.flatpak = FlatPakInstaller()
 
     def install(self) -> None:
+        self.flatpak.install()
         self._run_cmd(f"{self._get_last_build_install_cmd()} -y")
 
     def _get_last_build_install_cmd(self) -> Optional[str]:
