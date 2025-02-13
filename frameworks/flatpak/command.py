@@ -28,4 +28,5 @@ class Commands:
 
     def _get_installing_command(self) -> list:
         specific_os = f"{self.host_name} {self._host.version}"
+        print(specific_os)
         return self.commands.get(specific_os) or self.commands.get(self._get_os_family(), [])
