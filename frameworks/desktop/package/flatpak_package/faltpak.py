@@ -9,14 +9,20 @@ from frameworks.github_api import PullRequest
 from frameworks.host_control import FileUtils
 from frameworks.test_exceptions import FlatPakException
 
+from ..package import Package
 
-class Flatpak:
+
+class Flatpak(Package):
     config = FileUtils.read_json(join(dirname(realpath(__file__)), 'flatpak_config.json'))
     find_cmd_pattern = r"flatpak install --user[^\n]*"
 
     def __init__(self):
         self.pr = PullRequest(repo_name=self.config['repo_name'], pull_num=self.config["pull_num"])
         self.flatpak = FlatPakInstaller()
+
+    @property
+    def name(self) -> str:
+        return "Flatpak"
 
     def install(self) -> None:
         self.flatpak.install()

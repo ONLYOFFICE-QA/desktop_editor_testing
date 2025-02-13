@@ -1,3 +1,3 @@
 # -*- coding: utf-8 -*-
-from .desktop_tests import OpenTest, SnapOpenTest, FlatPakOpenTest, AppImageOpenTest
+from .desktop_tests import OpenTest, LinuxPackagesOpenTest
 from .tools import TestData, TestTools

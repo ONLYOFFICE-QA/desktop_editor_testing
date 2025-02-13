@@ -4,7 +4,7 @@ from rich import print
 
 from frameworks.host_control import HostInfo, FileUtils
 from frameworks.desktop.handlers.VersionHandler import VersionHandler
-from ..data import Data
+from frameworks.desktop.data import Data
 
 class UrlException(Exception): ...
 
@@ -13,7 +13,7 @@ class UrlGenerator:
         self.version = VersionHandler(data.version)
         self.host_name = HostInfo().name().lower()
         self.host_version = HostInfo().version
-        self.config = self._get_config(data.custom_config_path)
+        self.config = self._get_config(data.custom_config)
         print(f"[green]|INFO| Host Information: {self.host_name} {HostInfo().version}")
 
     @property

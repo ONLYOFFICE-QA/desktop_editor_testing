@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from invoke import task
-from tests import OpenTest, SnapOpenTest, FlatPakOpenTest, AppImageOpenTest, TestTools, TestData
+from tests import OpenTest, LinuxPackagesOpenTest, TestTools, TestData
 
 
 @task
@@ -23,17 +23,13 @@ def open_test(
         custom_config=config if config else None,
         telegram=telegram,
         license_file_path=license,
-        snap=snap,
-        appimage=appimage,
-        flatpak=flatpak
+        snap_package=snap,
+        appimage_package=appimage,
+        flatpak_package=flatpak
     )
 
-    if snap:
-        SnapOpenTest(test_data=config).run()
-    elif appimage:
-        AppImageOpenTest(test_data=config).run()
-    elif flatpak:
-        FlatPakOpenTest(test_data=config).run()
+    if snap or appimage or flatpak:
+        LinuxPackagesOpenTest(test_data=config).run()
     else:
         OpenTest(test_data=config).run()
 

@@ -8,7 +8,7 @@ from frameworks.test_exceptions import DesktopException
 from rich import print
 from rich.console import Console
 
-from .package import Package, AppImage, SnapPackege, Flatpak
+from .package import DefaultPackage, AppImage, SnapPackege, Flatpak
 from .data import Data
 
 console = Console()
@@ -16,11 +16,9 @@ console = Console()
 class DesktopEditor:
     def __init__(self, data: Data):
         self.data = data
-        self.lic_file_path = data.lic_file
-        self.config = self._get_config(data.custom_config_path)
-        self.package = Package(data)
-        self.snap_package = SnapPackege()
-        self.flatpak_package = Flatpak()
+        self.lic_file_path = data.license_file_path
+        self.config = self._get_config(data.custom_config)
+        self.package = self._get_package()
         self.appimage = AppImage(data=self.data)
         self.os = HostInfo().os
         self.debug_command = '--ascdesktop-support-debug-info'
@@ -92,13 +90,7 @@ class DesktopEditor:
         return self.config.get(self._get_run_command_key()) or raise_command_error()
 
     def _get_run_command_key(self):
-        if self.data.snap_package:
-            return 'snap_run_command'
-
-        if self.data.flatpak_package:
-            return 'flatpak_run_command'
-
-        return f'{HostInfo().os}_run_command'
+        return f'{HostInfo().os if self.data.is_default_package() else self.package.name.lower()}_run_command'
 
     def _generate_get_version_cmd(self) -> str:
         if self.os.lower() == 'windows':
@@ -127,6 +119,16 @@ class DesktopEditor:
             console.print(f"[cyan]|INFO| {output}")
             return wait_msg in output
         return False
+
+    def _get_package(self):
+        if self.data.flatpak_package:
+            return Flatpak()
+        elif self.data.snap_package:
+            return SnapPackege()
+        elif self.data.appimage_package:
+            return AppImage(data=self.data)
+        else:
+            return DefaultPackage(data=self.data)
 
     def _check_in_log_file(self, wait_msg: str) -> bool:
         try:

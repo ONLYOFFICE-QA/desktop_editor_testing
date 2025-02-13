@@ -4,13 +4,18 @@ from subprocess import call
 
 from frameworks.host_control import FileUtils
 from frameworks.snap import Snap
+from ..package import Package
 
 
-class SnapPackege:
+class SnapPackege(Package):
     config = FileUtils.read_json(join(dirname(realpath(__file__)), "snap_config.json"))
 
     def __init__(self):
         self.snap = Snap()
+
+    @property
+    def name(self) -> str:
+        return "Snap"
 
     def install(self) -> None:
         self.snap.install()
