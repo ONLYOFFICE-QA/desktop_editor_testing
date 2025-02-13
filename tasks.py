@@ -33,7 +33,7 @@ def open_test(
     elif appimage:
         AppImageOpenTest(test_data=config).run()
     elif flatpak:
-        FlatPakOpenTest(test_data=config)
+        FlatPakOpenTest(test_data=config).run()
     else:
         OpenTest(test_data=config).run()
 
