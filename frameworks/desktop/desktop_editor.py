@@ -83,13 +83,13 @@ class DesktopEditor:
             return print(f"[green]|INFO| Desktop activated")
 
     def _generate_running_command(self):
+        def raise_command_error():
+            raise ValueError(f"[red]|ERROR| Can't get running command, key: {HostInfo().os}_run_command")
+
         if self.data.appimage_package:
             return self.appimage.path
 
-        run_cmd = self.config.get(self._get_run_command_key(), None)
-        if run_cmd:
-            return run_cmd
-        raise ValueError(f"[red]|ERROR| Can't get running command, key: {HostInfo().os}_run_command")
+        return self.config.get(self._get_run_command_key()) or raise_command_error()
 
     def _get_run_command_key(self):
         if self.data.snap_package:
