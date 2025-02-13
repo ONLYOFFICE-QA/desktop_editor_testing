@@ -1,11 +1,6 @@
 # -*- coding: utf-8 -*-
-import os
-from os.path import join, basename
-from subprocess import call
-
-from frameworks.host_control import FileUtils
 from frameworks.test_exceptions import AppImageException, TestException
-from tests import TestTools, TestData
+from ..tools import TestTools, TestData
 
 
 class AppImageOpenTest:
