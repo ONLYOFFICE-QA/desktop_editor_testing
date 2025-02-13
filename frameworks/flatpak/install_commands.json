@@ -18,6 +18,5 @@
     "sudo add-apt-repository ppa:alexlarsson/flatpak -y",
     "sudo apt update",
     "sudo apt-get install flatpak -y"
-  ],
-
+  ]
 }
