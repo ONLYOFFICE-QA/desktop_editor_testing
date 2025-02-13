@@ -1,0 +1,31 @@
+{
+  "os_family": {
+    "debian": [
+      "debian",
+      "ubuntu",
+      "pop"
+    ],
+    "rhel": [
+      "centos",
+      "redos",
+      "altlinux",
+      "fedora"
+    ],
+    "suse": [
+      "opensuse"
+    ],
+    "linuxmint": [
+    ]
+  },
+
+  "rhel": [
+  ],
+  "debian": [
+    "sudo apt update",
+    "sudo apt install flatpak -y"
+  ],
+  "linuxmint": [
+  ],
+  "suse": [
+  ]
+}
