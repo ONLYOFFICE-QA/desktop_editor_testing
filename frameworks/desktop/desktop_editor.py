@@ -142,5 +142,5 @@ class DesktopEditor:
                         return True
             return False
 
-        except PermissionError:
+        except (PermissionError, FileNotFoundError):
             return False
