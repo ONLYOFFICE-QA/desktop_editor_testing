@@ -12,7 +12,7 @@ class Commands:
         self.commands: dict = FileUtils.read_json(join(dirname(realpath(__file__)), 'install_commands.json'))
         self._host = HostInfo()
         self.host_name = self._host.name().lower()
-        self.install_commands: list = self.commands.get(self._get_os_family(), [])
+        self.install_commands: list = self._get_installing_command()
         self.version: str = "flatpak --version"
 
     def _get_os_family(self) -> str:
