@@ -5,27 +5,40 @@
       "ubuntu",
       "pop"
     ],
+
     "rhel": [
       "centos",
       "redos",
       "altlinux",
       "fedora"
     ],
+
     "suse": [
       "opensuse"
     ],
+
     "linuxmint": [
     ]
   },
 
   "rhel": [
   ],
+
   "debian": [
     "sudo apt update",
-    "sudo apt install flatpak -y"
+    "sudo apt-get install flatpak -y"
   ],
+
+  "ubuntu 16.04": [
+    "sudo apt update",
+    "sudo add-apt-repository ppa:alexlarsson/flatpak -y",
+    "sudo apt update",
+    "sudo apt-get install flatpak -y"
+  ],
+
   "linuxmint": [
   ],
+
   "suse": [
   ]
 }
