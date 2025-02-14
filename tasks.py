@@ -28,10 +28,7 @@ def open_test(
         flatpak_package=flatpak
     )
 
-    if snap or appimage or flatpak:
-        LinuxPackagesOpenTest(test_data=config).run()
-    else:
-        OpenTest(test_data=config).run()
+    OpenTest(test_data=config).run()
 
 
 @task
