@@ -30,12 +30,14 @@ class DesktopEditor:
             log_out_mode: bool = False,
             stdout: bool = True
     ) -> Popen:
-        command = (
-            f"{self._generate_running_command()}"
-            f"{(' ' + self.log_out_cmd) if log_out_mode else ''}"
-            f"{(' ' + self.debug_command) if debug_mode else ''}"
-            f"{(' ' + file_path) if file_path else ''}".strip()
-        )
+        commands_parts = [
+            self._generate_running_command(),
+            self.log_out_cmd if log_out_mode else '',
+            self.debug_command if debug_mode else '',
+            file_path if file_path else ''
+        ]
+
+        command = " ".join(filter(None, commands_parts))
 
         if stdout:
             print(f"[green]|INFO| Open Desktop Editor via command: [cyan]{command}[/]")
