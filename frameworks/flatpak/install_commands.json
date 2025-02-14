@@ -9,14 +9,14 @@
   },
 
   "debian": [
-    "sudo apt update",
+    "sudo apt-get update",
     "sudo apt-get install flatpak -y"
   ],
 
   "ubuntu 16.04": [
-    "sudo apt update",
+    "sudo apt-get update",
     "sudo add-apt-repository ppa:alexlarsson/flatpak -y",
-    "sudo apt update",
+    "sudo apt-get update",
     "sudo apt-get install flatpak -y"
   ]
 }
