@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from invoke import task
-from tests import OpenTest, LinuxPackagesOpenTest, TestTools, TestData
+from tests import OpenTest, TestTools, TestData
 
 
 @task
