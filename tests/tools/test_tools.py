@@ -83,7 +83,7 @@ class TestTools:
         self.desktop_version = self.desktop.get_version()
         if not self.desktop_version or len([i for i in self.desktop_version.split('.') if i]) != 4:
             self.write_results('INCORRECT_VERSION')
-            raise TestException(f"[red]|ERROR| The version is not correct: {version}")
+            raise TestException(f"[red]|ERROR| The version is not correct: {self.desktop_version}")
 
     def check_error_on_screen(self):
         if self.is_old_windows_version:
