@@ -29,6 +29,7 @@ class TestTools:
         self.report = DesktopReport(self._report_path())
         self.error_images = self._get_error_images()
         self.virtual_display: bool = False
+        self.desktop_version = None
         self._create_display()
 
     @property
@@ -79,8 +80,8 @@ class TestTools:
             )
 
     def check_correct_version(self):
-        version = self.desktop.get_version()
-        if not version or len([i for i in version.split('.') if i]) != 4:
+        self.desktop_version = self.desktop.get_version()
+        if not self.desktop_version or len([i for i in self.desktop_version.split('.') if i]) != 4:
             self.write_results('INCORRECT_VERSION')
             raise TestException(f"[red]|ERROR| The version is not correct: {version}")
 
@@ -118,7 +119,7 @@ class TestTools:
     def write_results(self, exit_code: str):
         self.report.write(
             os=HostInfo().name(pretty=True),
-            version=self.data.version,
+            version=self.desktop_version or self.desktop.get_version(),
             package_name=self.desktop.package.name,
             exit_code=exit_code,
             tg_msg=self.data.telegram
@@ -143,7 +144,8 @@ class TestTools:
 
     def _report_path(self) -> str:
         title = self.config.get('title', 'Undefined_title')
-        return join(self.path.reports_dir, title, self.data.version, f"{self.data.version}_{title}_report.csv")
+        version = self.desktop_version or self.desktop.get_version() or f"TryCheck {self.data.version}"
+        return join(self.path.reports_dir, title, version, f"{version}_{title}_report.csv")
 
     def _close_warning_window(self) -> None:
         window = Window()
