@@ -144,8 +144,8 @@ class TestTools:
 
     def _report_path(self) -> str:
         title = self.config.get('title', 'Undefined_title')
-        version = self.desktop_version or self.desktop.get_version() or f"TryCheck {self.data.version}"
-        return join(self.path.reports_dir, title, version, f"{version}_{title}_report.csv")
+        desktop_version = self.desktop_version or self.desktop.get_version()
+        return join(self.path.reports_dir, title, self.data.version, f"{desktop_version}_{title}_report.csv")
 
     def _close_warning_window(self) -> None:
         window = Window()
