@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import re
 import time
-from dataclasses import asdict
 from os.path import basename, join
 from rich import print
 
@@ -26,10 +25,10 @@ class TestTools:
         self.warning_window_info = FileUtils.read_json(self.path.warning_window_info)
         self.old_desktop = self._create_desktop(version=self.data.update_from) if self.data.update_from else None
         self.host_name = re.sub(r"[\s/]", "", HostInfo().name(pretty=True))
-        self.report = DesktopReport(self._report_path())
+        self.desktop_version = None
+        self.report = None
         self.error_images = self._get_error_images()
         self.virtual_display: bool = False
-        self.desktop_version = None
         self._create_display()
 
     @property
@@ -142,7 +141,7 @@ class TestTools:
 
         return DesktopEditor(DesktopData(**filtered_data))
 
-    def _report_path(self) -> str:
+    def report_path(self) -> str:
         title = self.config.get('title', 'Undefined_title')
         desktop_version = self.desktop_version or self.desktop.get_version()
         return join(self.path.reports_dir, title, self.data.version, f"{desktop_version}_{title}_report.csv")
