@@ -66,9 +66,10 @@ class TestTools:
                 time.sleep(1)  # todo
                 self._close_warning_window() if not self.is_old_windows_version else None
                 self.check_error_on_screen()
-                Image.make_screenshot(
-                    f"{join(self.report.dir, f'{self.data.version}_{self.host_name}_open_editor_{try_num}.png')}"
-                )
+                if try_num == retries:
+                    Image.make_screenshot(
+                        f"{join(self.report.dir, f'{self.data.version}_{self.host_name}_open_editor_{try_num}.png')}"
+                    )
                 self.desktop.close()
                 try_num += 1
 
