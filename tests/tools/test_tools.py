@@ -53,8 +53,9 @@ class TestTools:
             Image.make_screenshot(
                 f"{join(self.report.dir, f'{self.data.version}_{self.host_name}_{basename(file)}.png')}")
 
-    def check_open_desktop(self, retries: int = 1, timeout: int = 30):
+    def check_open_desktop(self, retries: int = 20, timeout: int = 30):
         try:
+            try_num = 1
             for _try in range(retries):
                 self.desktop.wait_until_open(
                     self.desktop.open(log_out_mode=True),
@@ -64,10 +65,14 @@ class TestTools:
 
                 time.sleep(1)  # todo
                 self._close_warning_window() if not self.is_old_windows_version else None
+                self.check_error_on_screen()
+                Image.make_screenshot(
+                    f"{join(self.report.dir,
+                    f'{self.data.version}_{self.host_name}_open_editor_{try_num}.png')}"
+                )
                 self.desktop.close()
+                try_num += 1
 
-            self.check_error_on_screen()
-            Image.make_screenshot(f"{join(self.report.dir, f'{self.data.version}_{self.host_name}_open_editor.png')}")
         except DesktopException:
             self.write_results('NOT_OPENED')
             raise TestException("[red]|ERROR| Can't open desktop editor")
