@@ -12,9 +12,10 @@ from frameworks.desktop.handlers.VersionHandler import VersionHandler
 from frameworks.github_api import GitHubApi
 from frameworks.host_control import FileUtils, HostInfo
 from frameworks.test_exceptions import AppImageException
+from ..package import Package
 
 
-class AppImage:
+class AppImage(Package):
     repo_config = FileUtils.read_json(join(dirname(realpath(__file__)), "appimage_repo_config.json"))
     version_pattern = r"(\d+\.\d+\.\d+-\d+)"
 
@@ -25,7 +26,11 @@ class AppImage:
         self.find_version = f"{self.version_handler.without_build}-{self.version_handler.build}"
         self.path = None
 
-    def get(self) -> None:
+    @property
+    def name(self) -> str:
+        return 'AppImage'
+
+    def install(self) -> None:
         self._install_specific_dependencies()
         archive_path = self.download_appimage(artifact=self._get_artifact())
         execute_dir = self.unpacking_appimage_archive(archive_path=archive_path)

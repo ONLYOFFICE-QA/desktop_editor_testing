@@ -8,7 +8,7 @@ from frameworks.test_exceptions import DesktopException
 from rich import print
 from rich.console import Console
 
-from .package import Package, AppImage, SnapPackege
+from .package import DefaultPackage, AppImage, SnapPackage, Flatpak
 from .data import Data
 
 console = Console()
@@ -16,11 +16,9 @@ console = Console()
 class DesktopEditor:
     def __init__(self, data: Data):
         self.data = data
-        self.lic_file_path = data.lic_file
-        self.config = self._get_config(data.custom_config_path)
-        self.package = Package(data)
-        self.snap_package = SnapPackege()
-        self.appimage = AppImage(data=self.data)
+        self.lic_file_path = data.license_file_path
+        self.config = self._get_config(data.custom_config)
+        self.package = self._get_package()
         self.os = HostInfo().os
         self.debug_command = '--ascdesktop-support-debug-info'
         self.log_out_cmd = self._get_log_out_cmd()
@@ -32,12 +30,14 @@ class DesktopEditor:
             log_out_mode: bool = False,
             stdout: bool = True
     ) -> Popen:
-        command = (
-            f"{self._generate_running_command()}"
-            f"{(' ' + self.log_out_cmd) if log_out_mode else ''}"
-            f"{(' ' + self.debug_command) if debug_mode else ''}"
-            f"{(' ' + file_path) if file_path else ''}".strip()
-        )
+        commands_parts = [
+            self._generate_running_command(),
+            self.log_out_cmd if log_out_mode else '',
+            self.debug_command if debug_mode else '',
+            file_path if file_path else ''
+        ]
+
+        command = " ".join(filter(None, commands_parts))
 
         if stdout:
             print(f"[green]|INFO| Open Desktop Editor via command: [cyan]{command}[/]")
@@ -82,19 +82,17 @@ class DesktopEditor:
             return print(f"[green]|INFO| Desktop activated")
 
     def _generate_running_command(self):
-        if self.data.appimage_package:
-            return self.appimage.path
+        def raise_command_error():
+            raise DesktopException(f"|ERROR| Can't get running command, key: {HostInfo().os}_run_command")
 
-        run_cmd = self.config.get(self._get_run_command_key(), None)
-        if run_cmd:
-            return run_cmd
-        raise ValueError(f"[red]|ERROR| Can't get running command, key: {HostInfo().os}_run_command")
+        if self.data.appimage_package:
+            if self.package.path and isfile(self.package.path):
+                return self.package.path
+
+        return self.config.get(self._get_run_command_key()) or raise_command_error()
 
     def _get_run_command_key(self):
-        if self.data.snap_package:
-            return 'snap_run_command'
-
-        return f'{HostInfo().os}_run_command'
+        return f'{HostInfo().os if self.data.is_default_package() else self.package.name.lower()}_run_command'
 
     def _generate_get_version_cmd(self) -> str:
         if self.os.lower() == 'windows':
@@ -124,6 +122,16 @@ class DesktopEditor:
             return wait_msg in output
         return False
 
+    def _get_package(self):
+        if self.data.flatpak_package:
+            return Flatpak()
+        elif self.data.snap_package:
+            return SnapPackage()
+        elif self.data.appimage_package:
+            return AppImage(data=self.data)
+        else:
+            return DefaultPackage(data=self.data)
+
     def _check_in_log_file(self, wait_msg: str) -> bool:
         try:
             for output in [line.strip() for line in FileUtils.file_read_lines(self.log_file)]:
@@ -134,5 +142,5 @@ class DesktopEditor:
                         return True
             return False
 
-        except PermissionError:
+        except (PermissionError, FileNotFoundError):
             return False

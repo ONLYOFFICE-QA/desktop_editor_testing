@@ -6,32 +6,29 @@ from rich import print
 
 from pyvirtualdisplay import Display
 
-from frameworks.desktop import DesktopException, DesktopEditor, DesktopData, UrlException, PackageException
+from frameworks.desktop import DesktopException, DesktopEditor, DesktopData, UrlException
 from frameworks.host_control import FileUtils, HostInfo, Window
 from frameworks.image_handler import Image
-from frameworks.test_exceptions import TestException
+from frameworks.test_exceptions import TestException, PackageException
 
-from .paths import Paths
-from .desktop_report import  DesktopReport
+from .desktop_report import DesktopReport
 from .test_data import TestData
-
 
 
 class TestTools:
 
-
     def __init__(self, test_data: TestData):
         self.data = test_data
-        self.path = Paths()
+        self.path = self.data.path
         self.config = self.data.config
         self.desktop = self._create_desktop()
         self.warning_window_info = FileUtils.read_json(self.path.warning_window_info)
         self.old_desktop = self._create_desktop(version=self.data.update_from) if self.data.update_from else None
         self.host_name = re.sub(r"[\s/]", "", HostInfo().name(pretty=True))
-        self.report = DesktopReport(self._report_path())
+        self.desktop_version = None
+        self.report = DesktopReport(self.report_path())
         self.error_images = self._get_error_images()
         self.virtual_display: bool = False
-        self.package_name = self._get_packege_name()
         self._create_display()
 
     @property
@@ -53,7 +50,8 @@ class TestTools:
             time.sleep(15)  # TODO
             self._close_warning_window()
             self.check_error_on_screen()
-            Image.make_screenshot(f"{join(self.report.dir, f'{self.data.version}_{self.host_name}_{basename(file)}.png')}")
+            Image.make_screenshot(
+                f"{join(self.report.dir, f'{self.data.version}_{self.host_name}_{basename(file)}.png')}")
 
     def check_open_desktop(self, timeout: int = 30):
         try:
@@ -81,10 +79,10 @@ class TestTools:
             )
 
     def check_correct_version(self):
-        version = self.desktop.get_version()
-        if not version or len([i for i in version.split('.') if i]) != 4:
+        self.desktop_version = self.desktop.get_version()
+        if not self.desktop_version or len([i for i in self.desktop_version.split('.') if i]) != 4:
             self.write_results('INCORRECT_VERSION')
-            raise TestException(f"[red]|ERROR| The version is not correct: {version}")
+            raise TestException(f"[red]|ERROR| The version is not correct: {self.desktop_version}")
 
     def check_error_on_screen(self):
         if self.is_old_windows_version:
@@ -120,8 +118,8 @@ class TestTools:
     def write_results(self, exit_code: str):
         self.report.write(
             os=HostInfo().name(pretty=True),
-            version=self.data.version,
-            package_name=self.package_name,
+            version=self.desktop_version or self.desktop.get_version(),
+            package_name=self.desktop.package.name,
             exit_code=exit_code,
             tg_msg=self.data.telegram
         )
@@ -136,24 +134,14 @@ class TestTools:
         self.virtual_display = False
 
     def _create_desktop(self, version: str = None):
-        return DesktopEditor(
-            DesktopData(
-                version=version or self.data.version,
-                tmp_dir=self.path.tmp_dir,
-                custom_config_path=self.data.custom_config,
-                lic_file=self.data.license_file_path,
-                cache_dir=self.data.cache_dir,
-                snap_package=self.data.snap,
-                appimage_package=self.data.appimage
-            )
-        )
+        filtered_data = {k: v for k, v in  self.data.__dict__.items() if k in DesktopData.__annotations__.keys()}
 
-    def _get_packege_name(self) -> str:
-        if self.data.snap:
-            return 'Snap'
-        return self.desktop.package.name
+        if version:
+            filtered_data['version'] = version
 
-    def _report_path(self) -> str:
+        return DesktopEditor(DesktopData(**filtered_data))
+
+    def report_path(self) -> str:
         title = self.config.get('title', 'Undefined_title')
         return join(self.path.reports_dir, title, self.data.version, f"{self.data.version}_{title}_report.csv")
 
