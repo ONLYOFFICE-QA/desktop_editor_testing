@@ -53,8 +53,7 @@ class TestTools:
             Image.make_screenshot(
                 f"{join(self.report.dir, f'{self.data.version}_{self.host_name}_{basename(file)}.png')}")
 
-    def check_open_desktop(self, retries: int = 20, timeout: int = 30):
-        try_num = 1
+    def check_open_desktop(self, retries: int = 1, timeout: int = 30):
         try:
             for _try in range(retries):
                 self.desktop.wait_until_open(
@@ -64,18 +63,14 @@ class TestTools:
                 )
 
                 time.sleep(1)  # todo
-                self._close_warning_window() if not self.is_old_windows_version and self.is_windows else None
-                self.check_error_on_screen()
-                if try_num == retries:
-                    Image.make_screenshot(
-                        f"{join(self.report.dir, f'{self.data.version}_{self.host_name}_open_editor_{try_num}.png')}"
-                    )
+                self._close_warning_window() if not self.is_old_windows_version else None
                 self.desktop.close()
-                try_num += 1
 
+            self.check_error_on_screen()
+            Image.make_screenshot(f"{join(self.report.dir, f'{self.data.version}_{self.host_name}_open_editor.png')}")
         except DesktopException:
-            self.write_results(f'NOT_OPENED_ON_TRY_{try_num}')
-            raise TestException(f"[red]|ERROR| Can't open desktop editor on the {try_num}th attempt")
+            self.write_results('NOT_OPENED')
+            raise TestException("[red]|ERROR| Can't open desktop editor")
 
     def check_installed(self):
         installed_version = self.desktop.get_version()
