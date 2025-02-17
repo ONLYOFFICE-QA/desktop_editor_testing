@@ -16,7 +16,6 @@ class OpenTest:
     def run(self):
         print(f"[green]|INFO| {self.package_name} package test running...")
         self.install_desktop()
-        self._init_report()
         self.test_tools.check_installed() if self.is_default_package else None
         self.test_tools.check_correct_version()
         self.test_tools.desktop.set_license() if self.is_default_package else None
@@ -34,8 +33,6 @@ class OpenTest:
 
         self._install_specific_linux_desktop()
 
-    def _init_report(self) -> None:
-        self.test_tools.report = DesktopReport(self.test_tools.report_path())
 
     def _install_specific_linux_desktop(self):
         if self.test_tools.is_windows:

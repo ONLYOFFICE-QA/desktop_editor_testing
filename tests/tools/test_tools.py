@@ -26,7 +26,7 @@ class TestTools:
         self.old_desktop = self._create_desktop(version=self.data.update_from) if self.data.update_from else None
         self.host_name = re.sub(r"[\s/]", "", HostInfo().name(pretty=True))
         self.desktop_version = None
-        self.report = None
+        self.report = DesktopReport(self.report_path())
         self.error_images = self._get_error_images()
         self.virtual_display: bool = False
         self._create_display()
@@ -143,8 +143,7 @@ class TestTools:
 
     def report_path(self) -> str:
         title = self.config.get('title', 'Undefined_title')
-        desktop_version = self.desktop_version or self.desktop.get_version()
-        return join(self.path.reports_dir, title, self.data.version, f"{desktop_version}_{title}_report.csv")
+        return join(self.path.reports_dir, title, self.data.version, f"{self.data.version}_{title}_report.csv")
 
     def _close_warning_window(self) -> None:
         window = Window()

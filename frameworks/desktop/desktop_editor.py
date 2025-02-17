@@ -89,8 +89,6 @@ class DesktopEditor:
             if self.package.path and isfile(self.package.path):
                 return self.package.path
 
-            raise DesktopException("|ERROR| Appimage not found")
-
         return self.config.get(self._get_run_command_key()) or raise_command_error()
 
     def _get_run_command_key(self):
