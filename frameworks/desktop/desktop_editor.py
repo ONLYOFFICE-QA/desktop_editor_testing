@@ -47,7 +47,9 @@ class DesktopEditor:
         return Popen(command, stdout=PIPE, stderr=PIPE, shell=True)
 
     def close(self) -> None:
-        os.system(f"taskkill /f /im {self.process_name}" if self.os_is_windows() else f"pkill {self.process_name}")
+        cmd = f"taskkill /f /im {self.process_name}" if self.os_is_windows() else f"pkill {self.process_name}"
+        print(f"[green]|INFO| Close desktop via command: {cmd}")
+        os.system(cmd)
 
     def wait_until_open(
             self,
