@@ -54,8 +54,8 @@ class TestTools:
                 f"{join(self.report.dir, f'{self.data.version}_{self.host_name}_{basename(file)}.png')}")
 
     def check_open_desktop(self, retries: int = 20, timeout: int = 30):
+        try_num = 1
         try:
-            try_num = 1
             for _try in range(retries):
                 self.desktop.wait_until_open(
                     self.desktop.open(log_out_mode=True),
@@ -74,8 +74,8 @@ class TestTools:
                 try_num += 1
 
         except DesktopException:
-            self.write_results('NOT_OPENED')
-            raise TestException("[red]|ERROR| Can't open desktop editor")
+            self.write_results(f'NOT_OPENED_ON_TRY_{try_num}')
+            raise TestException(f"[red]|ERROR| Can't open desktop editor on the {try_num}th attempt")
 
     def check_installed(self):
         installed_version = self.desktop.get_version()
