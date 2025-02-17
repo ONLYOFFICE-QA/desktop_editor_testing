@@ -53,16 +53,19 @@ class TestTools:
             Image.make_screenshot(
                 f"{join(self.report.dir, f'{self.data.version}_{self.host_name}_{basename(file)}.png')}")
 
-    def check_open_desktop(self, timeout: int = 30):
+    def check_open_desktop(self, retries: int = 1, timeout: int = 30):
         try:
-            self.desktop.wait_until_open(
-                self.desktop.open(log_out_mode=True),
-                '[DesktopEditors]: start page loaded',
-                timeout=timeout
-            )
+            for _try in range(retries):
+                self.desktop.wait_until_open(
+                    self.desktop.open(log_out_mode=True),
+                    '[DesktopEditors]: start page loaded',
+                    timeout=timeout
+                )
 
-            time.sleep(1)  # todo
-            self._close_warning_window() if not self.is_old_windows_version else None
+                time.sleep(1)  # todo
+                self._close_warning_window() if not self.is_old_windows_version else None
+                self.desktop.close()
+
             self.check_error_on_screen()
             Image.make_screenshot(f"{join(self.report.dir, f'{self.data.version}_{self.host_name}_open_editor.png')}")
         except DesktopException:

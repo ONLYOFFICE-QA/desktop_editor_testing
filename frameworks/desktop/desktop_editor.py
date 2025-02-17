@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import os
 import re
 import time
 from os.path import join, dirname, isfile, basename, realpath
@@ -20,6 +21,7 @@ class DesktopEditor:
         self.config = self._get_config(data.custom_config)
         self.package = self._get_package()
         self.os = HostInfo().os
+        self.process_name = 'editors.exe' if self.os_is_windows() else 'editors'
         self.debug_command = '--ascdesktop-support-debug-info'
         self.log_out_cmd = self._get_log_out_cmd()
 
@@ -43,6 +45,9 @@ class DesktopEditor:
             print(f"[green]|INFO| Open Desktop Editor via command: [cyan]{command}[/]")
 
         return Popen(command, stdout=PIPE, stderr=PIPE, shell=True)
+
+    def close(self) -> None:
+        os.system(f"taskkill /f /im {self.process_name}" if self.os_is_windows() else f"pkill {self.process_name}")
 
     def wait_until_open(
             self,
@@ -80,6 +85,9 @@ class DesktopEditor:
             FileUtils.create_dir(license_dir, stdout=False)
             FileUtils.copy(self.lic_file_path, join(license_dir, basename(self.lic_file_path)))
             return print(f"[green]|INFO| Desktop activated")
+
+    def os_is_windows(self) -> bool:
+        return self.os == 'windows'
 
     def _generate_running_command(self):
         def raise_command_error():
