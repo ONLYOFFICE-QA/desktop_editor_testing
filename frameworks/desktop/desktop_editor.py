@@ -51,6 +51,7 @@ class DesktopEditor:
         return Popen(command, stdout=PIPE, stderr=PIPE, shell=True)
 
     def close(self) -> None:
+        print(f"[green]|INFO| Try close desktop")
         for proc in psutil.process_iter(attrs=['pid', 'name']):
             if proc.info['name'] in self.process_name:
                 pid = proc.info['pid']
@@ -63,7 +64,7 @@ class DesktopEditor:
 
     def wait_until_close(self, timeout: int = 10, check_interval: float = 0.5) -> bool:
         start_time = time.time()
-        print(f"[green]|INFO| Try close desktop")
+        print(f"[green]|INFO| Wait until close desktop")
         while time.time() - start_time < timeout:
             for proc in psutil.process_iter(attrs=['pid', 'name']):
                 if proc.info['name'] in self.process_name:
