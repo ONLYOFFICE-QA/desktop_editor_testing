@@ -53,7 +53,7 @@ class TestTools:
             Image.make_screenshot(
                 f"{join(self.report.dir, f'{self.data.version}_{self.host_name}_{basename(file)}.png')}")
 
-    def check_open_desktop(self, retries: int = 20, timeout: int = 30):
+    def check_open_desktop(self, retries: int = 5, timeout: int = 30):
         try_num = 1
         _retries = 1 if self.is_windows else retries # TODO Bug 70951
         try:
