@@ -20,6 +20,7 @@ class TestData:
     snap_package: bool = False
     appimage_package: bool = False
     flatpak_package: bool = False
+    open_retries: int = 10
 
     def __post_init__(self):
         self.tmp_dir = self.path.tmp_dir
