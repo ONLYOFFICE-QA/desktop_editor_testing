@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
 import os
 import re
+import signal
 import time
 from os.path import join, dirname, isfile, basename, realpath
 from subprocess import Popen, PIPE
+
+import psutil
+
 from frameworks.host_control import HostInfo, FileUtils
 from frameworks.test_exceptions import DesktopException
 from rich import print
@@ -47,10 +51,17 @@ class DesktopEditor:
         return Popen(command, stdout=PIPE, stderr=PIPE, shell=True)
 
     def close(self) -> None:
-        cmd = f"taskkill /f /im {self.process_name}" if self.os_is_windows() else f"pkill {self.process_name}"
-        print(f"[green]|INFO| Close desktop via command: {cmd}")
-        os.system(cmd)
-        time.sleep(1)
+        for proc in psutil.process_iter(attrs=['pid', 'name']):
+            if proc.info['name'] == self.process_name:
+                pid = proc.info['pid']
+                if self.os_is_windows():
+                    print(f"[green]|INFO| Sending close signal to {self.process_name} (PID: {pid}) on Windows")
+                    os.system(f"taskkill /IM {self.process_name}")
+                else:
+                    print(f"[green]|INFO| Sending SIGTERM to {self.process_name} (PID: {pid}) on Linux/macOS")
+                    os.kill(pid, signal.SIGTERM)
+                time.sleep(1)
+                return
 
     def wait_until_open(
             self,
