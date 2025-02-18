@@ -63,6 +63,21 @@ class DesktopEditor:
                 time.sleep(1)
                 return
 
+    def wait_until_close(self, timeout: int = 10, check_interval: float = 0.5):
+        start_time = time.time()
+        while time.time() - start_time < timeout:
+            for proc in psutil.process_iter(attrs=['pid', 'name']):
+                if proc.info['name'] == self.process_name:
+                    time.sleep(check_interval)
+                    break
+            else:
+                time.sleep(1)
+                print(f"[green]|INFO|  The {self.process_name} process has terminated")
+                return True
+
+        print(f"[red]|ERROR| Timeout time ({timeout} sec) has expired, process {self.process_name} has not terminated")
+        return False
+
     def wait_until_open(
             self,
             stdout_process: Popen,
