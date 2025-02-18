@@ -19,7 +19,7 @@ class OpenTest:
         self.test_tools.check_installed() if self.is_default_package else None
         self.test_tools.check_correct_version()
         self.test_tools.desktop.set_license() if self.is_default_package else None
-        self.test_tools.check_open_desktop(retries=10)
+        self.test_tools.check_open_desktop(retries=self.test_tools.config.open_retries)
         self.test_tools.check_open_files(self.data.path.good_files_dir)
         self.test_tools.write_results(f'Passed')
         self.test_tools.display.stop() if self.test_tools.virtual_display else None
