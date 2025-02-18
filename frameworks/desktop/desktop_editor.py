@@ -55,12 +55,11 @@ class DesktopEditor:
             if proc.info['name'] in self.process_name:
                 pid = proc.info['pid']
                 if self.os_is_windows():
-                    print(f"[green]|INFO| Sending close signal to {self.process_name} (PID: {pid}) on Windows")
+                    print(f"[green]|INFO| Sending close signal to {proc.info['name']} (PID: {pid}) on Windows")
                     os.system(f"taskkill /PID {pid}")
                 else:
-                    print(f"[green]|INFO| Sending SIGTERM to {self.process_name} (PID: {pid}) on Linux/macOS")
+                    print(f"[green]|INFO| Sending SIGTERM to {proc.info['name']} (PID: {pid}) on Linux/macOS")
                     os.kill(pid, signal.SIGTERM)
-
 
     def wait_until_close(self, timeout: int = 10, check_interval: float = 0.5) -> bool:
         start_time = time.time()
