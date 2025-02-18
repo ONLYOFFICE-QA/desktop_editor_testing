@@ -25,7 +25,7 @@ class DesktopEditor:
         self.config = self._get_config(data.custom_config)
         self.package = self._get_package()
         self.os = HostInfo().os
-        self.process_name = 'editors.exe' if self.os_is_windows() else 'editors'
+        self.process_name = ['editors.exe'] if self.os_is_windows() else ['editors', "DesktopEditors"]
         self.debug_command = '--ascdesktop-support-debug-info'
         self.log_out_cmd = self._get_log_out_cmd()
 
@@ -52,7 +52,7 @@ class DesktopEditor:
 
     def close(self) -> None:
         for proc in psutil.process_iter(attrs=['pid', 'name']):
-            if proc.info['name'] == self.process_name:
+            if proc.info['name'] in self.process_name:
                 pid = proc.info['pid']
                 if self.os_is_windows():
                     print(f"[green]|INFO| Sending close signal to {self.process_name} (PID: {pid}) on Windows")
@@ -63,11 +63,11 @@ class DesktopEditor:
                 time.sleep(1)
                 return
 
-    def wait_until_close(self, timeout: int = 10, check_interval: float = 0.5):
+    def wait_until_close(self, timeout: int = 10, check_interval: float = 0.5) -> bool:
         start_time = time.time()
         while time.time() - start_time < timeout:
             for proc in psutil.process_iter(attrs=['pid', 'name']):
-                if proc.info['name'] == self.process_name:
+                if proc.info['name'] in self.process_name:
                     time.sleep(check_interval)
                     break
             else:

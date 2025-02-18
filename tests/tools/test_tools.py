@@ -72,6 +72,7 @@ class TestTools:
                         f"{join(self.report.dir, f'{self.data.version}_{self.host_name}_open_editor_{try_num}.png')}"
                     )
                 self.desktop.close()
+                self.desktop.wait_until_close()
                 try_num += 1
 
         except DesktopException:
