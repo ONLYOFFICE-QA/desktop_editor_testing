@@ -2,7 +2,7 @@
 from frameworks.host_control import HostInfo
 from frameworks.test_exceptions import TestException, AppImageException, FlatPakException, SnapException
 from rich import print
-from ..tools import TestTools, TestData, DesktopReport
+from ..tools import TestTools, TestData
 
 
 class OpenTest:
