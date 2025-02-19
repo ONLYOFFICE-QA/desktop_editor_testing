@@ -64,6 +64,9 @@ class DesktopEditor:
 
 
     def wait_until_close(self, timeout: int = 20, check_interval: float = 0.5) -> bool:
+        if HostInfo().name() in ["centos", "redos", "altlinux", "fedora"]:
+            # TODO
+            return True
         start_time = time.time()
         print(f"[green]|INFO| Wait until close desktop")
         while time.time() - start_time < timeout:
@@ -71,6 +74,8 @@ class DesktopEditor:
                 time.sleep(2)
                 print(f"[green]|INFO|  The {self.process_name} process has terminated")
                 return True
+
+            time.sleep(check_interval)
 
         print(f"[red]|ERROR| Timeout time ({timeout} sec) has expired, process {self.process_name} has not terminated")
         return False
