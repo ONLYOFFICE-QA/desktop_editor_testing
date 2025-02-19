@@ -71,7 +71,7 @@ class DesktopEditor:
                     time.sleep(check_interval)
                     break
             else:
-                time.sleep(1)
+                time.sleep(2)
                 print(f"[green]|INFO|  The {self.process_name} process has terminated")
                 return True
 
