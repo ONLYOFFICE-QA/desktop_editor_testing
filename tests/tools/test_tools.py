@@ -71,13 +71,18 @@ class TestTools:
                     Image.make_screenshot(
                         f"{join(self.report.dir, f'{self.data.version}_{self.host_name}_open_editor_{try_num}.png')}"
                     )
-                self.desktop.close()
-                self.desktop.wait_until_close()
+                self.close_desktop()
                 try_num += 1
 
         except DesktopException:
             self.write_results(f'NOT_OPENED_ON_TRY_{try_num}')
             raise TestException(f"[red]|ERROR| Can't open desktop editor on the {try_num}th attempt")
+
+    def close_desktop(self, retries: int = 5):
+        for _try in range(retries):
+            self.desktop.close()
+            if self.desktop.wait_until_close():
+                break
 
     def check_installed(self):
         installed_version = self.desktop.get_version()
