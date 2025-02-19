@@ -47,7 +47,7 @@ class TestTools:
 
             print(f"[green]|INFO| Test opening file: {basename(file)}")
             self.desktop.open(file, log_out_mode=True, stdout=False)
-            time.sleep(15)  # TODO
+            time.sleep(20)  # TODO
             self._close_warning_window()
             self.check_error_on_screen()
             Image.make_screenshot(
