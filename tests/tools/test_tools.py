@@ -78,11 +78,12 @@ class TestTools:
             self.write_results(f'NOT_OPENED_ON_TRY_{try_num}')
             raise TestException(f"[red]|ERROR| Can't open desktop editor on the {try_num}th attempt")
 
-    def close_desktop(self, retries: int = 5):
+    def close_desktop(self, retries: int = 5, timeout: int = 5):
         for _try in range(retries):
             self.desktop.close()
             if self.desktop.wait_until_close():
                 return True
+            time.sleep(timeout)
 
         self.write_results(f'CLOSE_ERROR')
         raise TestException(f"Can't close desktop")
