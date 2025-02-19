@@ -68,12 +68,9 @@ class TestTools:
                 self._close_warning_window() if not self.is_old_windows_version and self.is_windows else None
                 self.check_error_on_screen()
                 if try_num == retries:
-                    print("take screen")
-
                     Image.make_screenshot(
                         f"{join(self.report.dir, f'{self.data.version}_{self.host_name}_open_editor_{try_num}.png')}"
                     )
-                    print("finfish take")
                 self.desktop.close()
                 self.desktop.wait_until_close()
                 try_num += 1
@@ -103,7 +100,6 @@ class TestTools:
 
         print(f"[green]|INFO| Check errors on screen")
         for error_img in self.error_images:
-            print("take screen")
             if Image.is_present(error_img):
                 Image.make_screenshot(join(self.report.dir, f'{self.data.version}_{self.host_name}_error_screen.png'))
                 self.write_results('ERROR')
