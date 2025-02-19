@@ -104,6 +104,7 @@ class TestTools:
         print(f"[green]|INFO| Check errors on screen")
         for error_img in self.error_images:
             print("take screen")
+            print(0)
             if Image.is_present(error_img):
                 print(1)
                 Image.make_screenshot(join(self.report.dir, f'{self.data.version}_{self.host_name}_error_screen.png'))
