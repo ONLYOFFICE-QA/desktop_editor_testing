@@ -72,7 +72,6 @@ class DesktopEditor:
         print(f"[green]|INFO| Wait until close desktop")
         while time.time() - start_time < timeout:
             if not self.check_desktop_proc():
-                time.sleep(2)
                 print(f"[green]|INFO|  The {self.process_name} process has terminated")
                 return True
 
