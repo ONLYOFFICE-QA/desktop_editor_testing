@@ -35,7 +35,8 @@ class ImageNewSystem(Image):
             window_coordinates: tuple = None,
             threshold: "int | float" = 0.8
     ) -> bool:
-        window = cv2.cvtColor(ImageNewSystem.grab_coordinate(window_coordinates), cv2.COLOR_BGR2GRAY)
+        img = ImageNewSystem.grab_coordinate(window_coordinates)
+        window = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         template = cv2.cvtColor(cv2.imread(template) if isinstance(template, str) else template, cv2.COLOR_BGR2GRAY)
         _, max_val, _, _ = cv2.minMaxLoc(cv2.matchTemplate(window, template, cv2.TM_CCOEFF_NORMED))
         return True if max_val >= threshold else False
@@ -47,7 +48,8 @@ class ImageNewSystem(Image):
         """
         if isinstance(window_coordinates, tuple):
             return np.array(ImageGrab.grab(bbox=window_coordinates))
-        return np.array(ImageGrab.grab())
+        img = ImageGrab.grab()
+        return np.array(img)
 
     @staticmethod
     def find_contours(img: np.ndarray):
