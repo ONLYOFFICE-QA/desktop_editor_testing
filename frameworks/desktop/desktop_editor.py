@@ -64,10 +64,6 @@ class DesktopEditor:
 
 
     def wait_until_close(self, timeout: int = 20, check_interval: float = 0.5) -> bool:
-        if HostInfo().name() in ["centos", "redos", "altlinux", "fedora"] and self.data.snap_package:
-            # TODO
-            return True
-
         start_time = time.time()
         print(f"[green]|INFO| Wait until close desktop")
         while time.time() - start_time < timeout:
