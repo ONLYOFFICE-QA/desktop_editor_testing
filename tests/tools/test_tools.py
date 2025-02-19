@@ -82,7 +82,10 @@ class TestTools:
         for _try in range(retries):
             self.desktop.close()
             if self.desktop.wait_until_close():
-                break
+                return True
+
+        self.write_results(f'CLOSE_ERROR')
+        raise TestException(f"Can't close desktop")
 
     def check_installed(self):
         installed_version = self.desktop.get_version()
