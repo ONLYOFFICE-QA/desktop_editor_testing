@@ -17,7 +17,7 @@ EXCEPTIONS = {"python"}
 PYTHON36_VERSIONS = {
     "opencv-python": "4.3.0.38",
     "rich": "12.6.0",
-    "pillow": "9.0.0"
+    "pillow": "8.4.0"
 }
 
 WINDOWS_VISTA = {
