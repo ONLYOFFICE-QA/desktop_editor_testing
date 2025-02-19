@@ -4,6 +4,8 @@ from re import search
 from subprocess import call
 from typing import Optional
 
+import requests
+
 from frameworks.flatpak import FlatPakInstaller
 from frameworks.github_api import PullRequest
 from frameworks.host_control import FileUtils
@@ -26,7 +28,18 @@ class Flatpak(Package):
 
     def install(self) -> None:
         self.flatpak.install()
-        self._run_cmd(f"{self._get_last_build_install_cmd()} -y")
+        command = self._get_last_build_install_cmd()
+        if not self._check_package_exist(link=self._get_package_link(command=command)):
+            raise FlatPakException(f"package not exist on {command}")
+
+        self._run_cmd(f"{command} -y")
+
+    @staticmethod
+    def _get_package_link(command: str) -> str:
+        return next((part for part in command.split() if part.startswith('http')), '')
+
+    def _check_package_exist(self, link: str) -> bool:
+        return requests.get(link).status_code == 200
 
     def _get_last_build_install_cmd(self) -> Optional[str]:
         newest_comment = max(self._get_filtered_comments(), key=lambda c: c["created_at"])

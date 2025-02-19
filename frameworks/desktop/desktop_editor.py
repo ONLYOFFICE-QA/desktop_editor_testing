@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
 import os
 import re
+import signal
 import time
 from os.path import join, dirname, isfile, basename, realpath
 from subprocess import Popen, PIPE
+
+import psutil
+
 from frameworks.host_control import HostInfo, FileUtils
 from frameworks.test_exceptions import DesktopException
 from rich import print
@@ -21,7 +25,7 @@ class DesktopEditor:
         self.config = self._get_config(data.custom_config)
         self.package = self._get_package()
         self.os = HostInfo().os
-        self.process_name = 'editors.exe' if self.os_is_windows() else 'editors'
+        self.process_name = ['editors.exe'] if self.os_is_windows() else ['editors', "DesktopEditors"]
         self.debug_command = '--ascdesktop-support-debug-info'
         self.log_out_cmd = self._get_log_out_cmd()
 
@@ -47,10 +51,32 @@ class DesktopEditor:
         return Popen(command, stdout=PIPE, stderr=PIPE, shell=True)
 
     def close(self) -> None:
-        cmd = f"taskkill /f /im {self.process_name}" if self.os_is_windows() else f"pkill {self.process_name}"
-        print(f"[green]|INFO| Close desktop via command: {cmd}")
-        os.system(cmd)
-        time.sleep(1)
+        print(f"[green]|INFO| Try close desktop")
+        for proc in psutil.process_iter(attrs=['pid', 'name']):
+            if proc.info['name'] in self.process_name:
+                pid = proc.info['pid']
+                if self.os_is_windows():
+                    print(f"[green]|INFO| Sending close signal to {proc.info['name']} (PID: {pid}) on Windows")
+                    os.system(f"taskkill /PID {pid}")
+                else:
+                    print(f"[green]|INFO| Sending SIGTERM to {proc.info['name']} (PID: {pid}) on Linux/macOS")
+                    os.kill(pid, signal.SIGTERM)
+
+    def wait_until_close(self, timeout: int = 10, check_interval: float = 0.5) -> bool:
+        start_time = time.time()
+        print(f"[green]|INFO| Wait until close desktop")
+        while time.time() - start_time < timeout:
+            for proc in psutil.process_iter(attrs=['pid', 'name']):
+                if proc.info['name'] in self.process_name:
+                    time.sleep(check_interval)
+                    break
+            else:
+                time.sleep(2)
+                print(f"[green]|INFO|  The {self.process_name} process has terminated")
+                return True
+
+        print(f"[red]|ERROR| Timeout time ({timeout} sec) has expired, process {self.process_name} has not terminated")
+        return False
 
     def wait_until_open(
             self,

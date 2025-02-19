@@ -47,16 +47,17 @@ class TestTools:
 
             print(f"[green]|INFO| Test opening file: {basename(file)}")
             self.desktop.open(file, log_out_mode=True, stdout=False)
-            time.sleep(15)  # TODO
+            time.sleep(20)  # TODO
             self._close_warning_window()
             self.check_error_on_screen()
             Image.make_screenshot(
                 f"{join(self.report.dir, f'{self.data.version}_{self.host_name}_{basename(file)}.png')}")
 
-    def check_open_desktop(self, retries: int = 20, timeout: int = 30):
+    def check_open_desktop(self, retries: int = 5, timeout: int = 30):
         try_num = 1
+        _retries = 1 if self.is_windows else retries # TODO Bug 70951
         try:
-            for _try in range(retries):
+            for _try in range(_retries):
                 self.desktop.wait_until_open(
                     self.desktop.open(log_out_mode=True),
                     '[DesktopEditors]: start page loaded',
@@ -71,6 +72,7 @@ class TestTools:
                         f"{join(self.report.dir, f'{self.data.version}_{self.host_name}_open_editor_{try_num}.png')}"
                     )
                 self.desktop.close()
+                self.desktop.wait_until_close()
                 try_num += 1
 
         except DesktopException:
@@ -126,7 +128,7 @@ class TestTools:
     def write_results(self, exit_code: str):
         self.report.write(
             os=HostInfo().name(pretty=True),
-            version=self.desktop_version or self.desktop.get_version(),
+            version=self.desktop.get_version(),
             package_name=self.desktop.package.name,
             exit_code=exit_code,
             tg_msg=self.data.telegram

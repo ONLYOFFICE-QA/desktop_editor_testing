@@ -2,7 +2,7 @@
 from frameworks.host_control import HostInfo
 from frameworks.test_exceptions import TestException, AppImageException, FlatPakException, SnapException
 from rich import print
-from ..tools import TestTools, TestData, DesktopReport
+from ..tools import TestTools, TestData
 
 
 class OpenTest:
@@ -19,7 +19,7 @@ class OpenTest:
         self.test_tools.check_installed() if self.is_default_package else None
         self.test_tools.check_correct_version()
         self.test_tools.desktop.set_license() if self.is_default_package else None
-        self.test_tools.check_open_desktop()
+        self.test_tools.check_open_desktop(retries=self.data.open_retries)
         self.test_tools.check_open_files(self.data.path.good_files_dir)
         self.test_tools.write_results(f'Passed')
         self.test_tools.display.stop() if self.test_tools.virtual_display else None

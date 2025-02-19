@@ -14,7 +14,8 @@ def open_test(
         license: str = None,
         snap: bool = False,
         appimage: bool = False,
-        flatpak: bool = False
+        flatpak: bool = False,
+        open_retries: int = 10
 ):
     config = TestData(
         version=version,
@@ -25,7 +26,8 @@ def open_test(
         license_file_path=license,
         snap_package=snap,
         appimage_package=appimage,
-        flatpak_package=flatpak
+        flatpak_package=flatpak,
+        open_retries=open_retries
     )
 
     OpenTest(test_data=config).run()
