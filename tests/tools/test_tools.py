@@ -98,19 +98,15 @@ class TestTools:
             raise TestException(f"[red]|ERROR| The version is not correct: {self.desktop_version}")
 
     def check_error_on_screen(self):
-        if self.is_old_windows_version or self.host_name == 'debian':
+        if self.is_old_windows_version:
             return print("[cyan]|INFO| OpenCv not supported on this OS")
 
         print(f"[green]|INFO| Check errors on screen")
         for error_img in self.error_images:
             print("take screen")
-            print(0)
             if Image.is_present(error_img):
-                print(1)
                 Image.make_screenshot(join(self.report.dir, f'{self.data.version}_{self.host_name}_error_screen.png'))
-                print(2)
                 self.write_results('ERROR')
-                print(3)
                 raise TestException(f"[red]|ERROR| An error has been detected.")
 
     def install_package(
