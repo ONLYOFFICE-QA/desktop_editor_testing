@@ -58,6 +58,7 @@ class TestTools:
         _retries = 1 if self.is_windows else retries # TODO Bug 70951
         try:
             for _try in range(_retries):
+                process = self.desktop.open(log_out_mode=True)
                 self.desktop.wait_until_open(
                     self.desktop.open(log_out_mode=True),
                     '[DesktopEditors]: start page loaded',
@@ -71,6 +72,9 @@ class TestTools:
                     Image.make_screenshot(
                         f"{join(self.report.dir, f'{self.data.version}_{self.host_name}_open_editor_{try_num}.png')}"
                     )
+
+                process.terminate()
+                process.wait()
                 self.close_desktop()
                 try_num += 1
 
