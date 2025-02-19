@@ -59,12 +59,7 @@ class TestTools:
         try:
             for _try in range(_retries):
                 process = self.desktop.open(log_out_mode=True)
-                self.desktop.wait_until_open(
-                    self.desktop.open(log_out_mode=True),
-                    '[DesktopEditors]: start page loaded',
-                    timeout=timeout
-                )
-
+                self.desktop.wait_until_open(process,'[DesktopEditors]: start page loaded',timeout=timeout)
                 time.sleep(1)  # todo
                 self._close_warning_window() if not self.is_old_windows_version and self.is_windows else None
                 self.check_error_on_screen()
