@@ -95,7 +95,7 @@ class TestTools:
             raise TestException(f"[red]|ERROR| The version is not correct: {self.desktop_version}")
 
     def check_error_on_screen(self):
-        if self.is_old_windows_version:
+        if self.is_old_windows_version or self.host_name == 'debian':
             return print("[cyan]|INFO| OpenCv not supported on this OS")
 
         print(f"[green]|INFO| Check errors on screen")
