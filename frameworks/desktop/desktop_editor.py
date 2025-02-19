@@ -97,7 +97,7 @@ class DesktopEditor:
             while (time.time() - start_time) < timeout:
                 status.update(f'[green]|INFO| Waiting for {wait_msg}: {timeout-(time.time() - start_time):.02f} sec.')
                 if self._wait_msg_is_present(wait_msg, stdout_process):
-                    break
+                    return
             else:
                 raise DesktopException(
                     f"[red]|ERROR| The waiting time {timeout} seconds for the editor to open has expired."
