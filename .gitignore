@@ -2,3 +2,6 @@
 /tmp/
 /lic_file/*
 /tests/assets/test_lic.lickey
+**/.idea/
+**/.pytest_cache/
+**/__pycache__/
