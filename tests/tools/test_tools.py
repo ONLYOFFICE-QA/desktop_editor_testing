@@ -55,9 +55,8 @@ class TestTools:
 
     def check_open_desktop(self, retries: int = 5, timeout: int = 30):
         try_num = 1
-        _retries = 1 if self.is_windows else retries # TODO Bug 70951
         try:
-            for _try in range(_retries):
+            for _try in range(retries):
                 process = self.desktop.open(log_out_mode=True)
                 self.desktop.wait_until_open(process,'[DesktopEditors]: start page loaded',timeout=timeout)
                 time.sleep(1)  # todo
