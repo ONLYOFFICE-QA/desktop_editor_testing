@@ -45,11 +45,17 @@ class AppImage(Package):
     @retry(max_attempts=3, interval=1)
     def download_appimage(self, artifact: dict) -> str:
         print(f"[green]|INFO| Downloading AppImage: {artifact['name']}")
-        download_path = self.api.artifacts.downloads(
-            artifact_url=artifact['archive_download_url'],
-            output_dir=self.data.tmp_dir,
-            file_name=f"{artifact['name']}.zip"
-        )
+        try:
+            download_path = self.api.artifacts.downloads(
+                artifact_url=artifact['archive_download_url'],
+                output_dir=self.data.tmp_dir,
+                file_name=f"{artifact['name']}.zip"
+            )
+
+        except requests.exceptions.ConnectionError as e:
+            print(f"[red]|WARNING| Connection Error: {e}")
+            raise AppImageException(f"[red]|ERROR| Can't download appimage: {artifact['name']}")
+
         if artifact['size_in_bytes'] != getsize(download_path):
             raise AppImageException(f"Failed downloads appimage.")
 

@@ -62,20 +62,24 @@ class DesktopEditor:
                     print(f"[green]|INFO| Sending SIGTERM to {proc.info['name']} (PID: {pid}) on Linux/macOS")
                     os.kill(pid, signal.SIGTERM)
 
-    def wait_until_close(self, timeout: int = 10, check_interval: float = 0.5) -> bool:
+
+    def wait_until_close(self, timeout: int = 20, check_interval: float = 0.5) -> bool:
         start_time = time.time()
         print(f"[green]|INFO| Wait until close desktop")
         while time.time() - start_time < timeout:
-            for proc in psutil.process_iter(attrs=['pid', 'name']):
-                if proc.info['name'] in self.process_name:
-                    time.sleep(check_interval)
-                    break
-            else:
-                time.sleep(2)
+            if not self.check_desktop_proc():
                 print(f"[green]|INFO|  The {self.process_name} process has terminated")
                 return True
 
+            time.sleep(check_interval)
+
         print(f"[red]|ERROR| Timeout time ({timeout} sec) has expired, process {self.process_name} has not terminated")
+        return False
+
+    def check_desktop_proc(self):
+        for proc in psutil.process_iter(attrs=['pid', 'name']):
+            if proc.info['name'] in self.process_name:
+                return True
         return False
 
     def wait_until_open(
@@ -89,7 +93,7 @@ class DesktopEditor:
             while (time.time() - start_time) < timeout:
                 status.update(f'[green]|INFO| Waiting for {wait_msg}: {timeout-(time.time() - start_time):.02f} sec.')
                 if self._wait_msg_is_present(wait_msg, stdout_process):
-                    break
+                    return
             else:
                 raise DesktopException(
                     f"[red]|ERROR| The waiting time {timeout} seconds for the editor to open has expired."

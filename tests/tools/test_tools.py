@@ -58,12 +58,8 @@ class TestTools:
         _retries = 1 if self.is_windows else retries # TODO Bug 70951
         try:
             for _try in range(_retries):
-                self.desktop.wait_until_open(
-                    self.desktop.open(log_out_mode=True),
-                    '[DesktopEditors]: start page loaded',
-                    timeout=timeout
-                )
-
+                process = self.desktop.open(log_out_mode=True)
+                self.desktop.wait_until_open(process,'[DesktopEditors]: start page loaded',timeout=timeout)
                 time.sleep(1)  # todo
                 self._close_warning_window() if not self.is_old_windows_version and self.is_windows else None
                 self.check_error_on_screen()
@@ -71,6 +67,9 @@ class TestTools:
                     Image.make_screenshot(
                         f"{join(self.report.dir, f'{self.data.version}_{self.host_name}_open_editor_{try_num}.png')}"
                     )
+
+                process.terminate()
+                process.wait()
                 self.close_desktop()
                 try_num += 1
 
@@ -78,11 +77,12 @@ class TestTools:
             self.write_results(f'NOT_OPENED_ON_TRY_{try_num}')
             raise TestException(f"[red]|ERROR| Can't open desktop editor on the {try_num}th attempt")
 
-    def close_desktop(self, retries: int = 5):
+    def close_desktop(self, retries: int = 5, timeout: int = 5):
         for _try in range(retries):
             self.desktop.close()
             if self.desktop.wait_until_close():
                 return True
+            time.sleep(timeout)
 
         self.write_results(f'CLOSE_ERROR')
         raise TestException(f"Can't close desktop")
