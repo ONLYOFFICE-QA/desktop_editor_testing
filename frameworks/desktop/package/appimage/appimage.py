@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import re
+import requests
 from os.path import dirname, realpath, join, getsize
 from subprocess import call
 from typing import Optional
