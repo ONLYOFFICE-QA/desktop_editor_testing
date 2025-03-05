@@ -189,6 +189,3 @@ class DesktopEditor:
 
         except (PermissionError, FileNotFoundError):
             return False
-
-        # finally:
-        #     FileUtils.delete(self.log_file)
