@@ -179,8 +179,12 @@ class DesktopEditor:
                 if output:
                     console.print(f"[cyan]|INFO| {output}")
                     if wait_msg in output:
+                        print(f"[green]|INFO| {wait_msg} found in log file")
                         FileUtils.delete(self.log_file)
                         return True
+
+            print(f"[red]|ERROR| {wait_msg} not found in log file")
+            FileUtils.delete(self.log_file)
             return False
 
         except (PermissionError, FileNotFoundError):
