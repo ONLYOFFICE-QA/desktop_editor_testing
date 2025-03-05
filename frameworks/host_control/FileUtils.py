@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 import json
-from os import makedirs, walk
+from os import makedirs, walk, chmod, remove
 from os.path import isfile, isdir, join, basename, getsize, exists
 from random import randint
-from shutil import copyfile
+from shutil import copyfile, rmtree
 from subprocess import getoutput, Popen, PIPE
 from codecs import open as codecs_open
 from zipfile import ZipFile
@@ -189,3 +189,39 @@ class FileUtils:
 
         print(f'[green]|INFO| Unpack Completed to: {execute_path}') if stdout else None
         return execute_path
+
+    @staticmethod
+    def delete(
+            path: "str | tuple | list",
+            stdout: bool = True,
+            stderr: bool = True,
+            full_access: bool = False
+    ) -> None:
+        """
+        Delete files or directories with optional full access permission.
+
+        :param path: A single path as a string, or multiple paths as a tuple or list.
+        :param stdout: Whether to print informational messages to stdout. Defaults to True.
+        :param stderr: Whether to print error messages to stderr. Defaults to True.
+        :param full_access: If True, sets full access permissions (0o777) before deletion. Defaults to False.
+        """
+        if not path:
+            return print(f"[red]|DELETE ERROR| Path should be string, tuple or list not {path}") if stderr else None
+
+        for _path in [path] if isinstance(path, str) else path:
+            object_path = _path.rstrip("*")
+            if not exists(object_path):
+                print(f"[bold red]|DELETE WARNING| File not exist: {object_path}") if stderr else ...
+                continue
+
+            chmod(path, 0o777) if full_access else None
+
+            if isdir(object_path):
+                rmtree(_path, ignore_errors=True)
+            else:
+                remove(object_path)
+
+            if stderr and exists(object_path):
+                print(f"[bold red]|DELETE WARNING| Is not deleted: {_path}")
+            else:
+                print(f'[green]|INFO| Deleted: {_path}') if stdout else ...
