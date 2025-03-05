@@ -179,11 +179,12 @@ class DesktopEditor:
                 if output:
                     console.print(f"[cyan]|INFO| {output}")
                     if wait_msg in output:
+                        FileUtils.delete(self.log_file)
                         return True
             return False
 
         except (PermissionError, FileNotFoundError):
             return False
 
-        finally:
-            FileUtils.delete(self.log_file)
+        # finally:
+        #     FileUtils.delete(self.log_file)
