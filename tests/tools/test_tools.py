@@ -137,6 +137,7 @@ class TestTools:
         self.report.write(
             os=HostInfo().name(pretty=True),
             version=self.desktop.get_version(),
+            test_name=self.data.test_name,
             package_name=self.desktop.package.name,
             exit_code=exit_code,
             tg_msg=self.data.telegram

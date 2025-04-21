@@ -9,6 +9,7 @@ class OpenTest:
 
     def __init__(self, test_data: TestData):
         self.data = test_data
+        self.data.test_name = 'open_test'
         self.test_tools = TestTools(test_data=self.data)
         self.package_name = self.test_tools.desktop.package.name
         self.is_default_package = self.test_tools.desktop.data.is_default_package()
