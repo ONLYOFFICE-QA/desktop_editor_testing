@@ -21,6 +21,7 @@ class TestData:
     appimage_package: bool = False
     flatpak_package: bool = False
     open_retries: int = 10
+    test_name: str = None
 
     def __post_init__(self):
         self.tmp_dir = self.path.tmp_dir

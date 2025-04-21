@@ -13,9 +13,18 @@ class DesktopReport:
         self.dir = dirname(self.path)
         FileUtils.create_dir(self.dir, stdout=False)
 
-    def write(self, os: str, version: str, package_name: str, exit_code: str, tg_msg: bool = False, update_from: str = None):
+    def write(
+            self,
+            os: str,
+            version: str,
+            test_name: str,
+            package_name: str,
+            exit_code: str,
+            tg_msg: bool = False,
+            update_from: str = None
+    ):
         self._write_titles() if not isfile(self.path) else ...
-        self._writer(mode='a', message=[os, version, package_name, exit_code])
+        self._writer(mode='a', message=[os, version, test_name, package_name, exit_code])
         self.send_to_telegram(exit_code, package_name, version, update_from) if tg_msg else ...
 
     def send_to_telegram(self, results: str, package_name: str, version: str, update_from):
@@ -36,4 +45,4 @@ class DesktopReport:
             writer.writerow(message)
 
     def _write_titles(self):
-        self._writer(mode='w', message=['Os', 'Version', 'Package_name', 'Exit_code'])
+        self._writer(mode='w', message=['Os', 'Version', 'Test_name', 'Package_name', 'Exit_code'])
