@@ -10,7 +10,8 @@
       "centos",
       "redos",
       "altlinux",
-      "fedora"
+      "fedora",
+      "almalinux"
     ],
 
     "suse": [
