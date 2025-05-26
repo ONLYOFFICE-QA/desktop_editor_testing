@@ -5,7 +5,7 @@
   "xp_system": ["vista", "xp"],
   "os_family": {
     "debian": ["debian", "ubuntu", "linuxmint", "pop"],
-    "rhel": ["centos", "redos", "altlinux", "fedora"],
+    "rhel": ["centos", "redos", "altlinux", "fedora", "almalinux"],
     "suse": ["opensuse"],
     "inno": ["windows"]
   },
