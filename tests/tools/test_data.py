@@ -20,7 +20,7 @@ class TestData:
     snap_package: bool = False
     appimage_package: bool = False
     flatpak_package: bool = False
-    open_retries: int = 10
+    open_retries: int = 5
     test_name: str = None
 
     def __post_init__(self):

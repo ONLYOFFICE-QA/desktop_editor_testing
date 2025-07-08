@@ -1,0 +1,11 @@
+# -*- coding: utf-8 -*-
+invoke
+rich
+psutil
+requests
+distro
+pyvirtualdisplay
+opencv-python
+urllib3
+pillow
+pywin32

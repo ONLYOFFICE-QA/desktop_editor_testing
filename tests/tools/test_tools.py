@@ -51,7 +51,8 @@ class TestTools:
             self._close_warning_window()
             self.check_error_on_screen()
             Image.make_screenshot(
-                f"{join(self.report.dir, f'{self.data.version}_{self.host_name}_{basename(file)}.png')}")
+                f"{join(self.report.dir, f'{self.data.version}_{self.host_name}_{basename(file)}.png')}"
+            )
 
     def check_open_desktop(self, retries: int = 5, timeout: int = 30):
         try_num = 1
@@ -175,7 +176,7 @@ class TestTools:
 
             window.close(window_hwnd)
 
-        time.sleep(0.5)
+        time.sleep(1)
 
     def _get_error_images(self) -> list:
         return [Image.read(img_path=path) for path in FileUtils.get_paths(self.path.error_img_dir)]
