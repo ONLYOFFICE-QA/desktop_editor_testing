@@ -18,7 +18,6 @@ class ImageNewSystem(Image):
             template: str,
             threshold: "int | float" = 0.8
     ) -> "list[int, int] | None":
-
         window = cv2.cvtColor(ImageNewSystem.grab_coordinate(window_coord), cv2.COLOR_BGR2GRAY)
         template = cv2.cvtColor(cv2.imread(template), cv2.COLOR_BGR2GRAY)
         min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(cv2.matchTemplate(window, template, cv2.TM_CCOEFF_NORMED))
