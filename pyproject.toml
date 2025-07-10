@@ -18,7 +18,7 @@ opencv-python = "*"
 urllib3 = '*'
 pillow = '*'
 pywin32 = { version = "*", markers = "sys_platform == 'win32'" }
-pytest = { version = "^8.3.4", python = ">=3.8" }
+
 
 
 [build-system]
