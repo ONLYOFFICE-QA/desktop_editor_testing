@@ -24,7 +24,7 @@
     },
     "inno": {
       "package": "ONLYOFFICE-DesktopEditors-[version]-x64.exe",
-      "package_xp": "ONLYOFFICE-DesktopEditors-XP-[version].{build}-x64.exe"
+      "package_xp": "ONLYOFFICE-DesktopEditors-XP-[version]-x64.exe"
     }
   }
 }
