@@ -24,7 +24,7 @@ class UrlGenerator:
             if HostInfo().arch == 'aarch64':
                 self.__arch = 'arm64'
             else:
-                self.__arch = HostInfo().arch
+                self.__arch = 'amd64'
         return self.__arch
 
     @property
@@ -70,8 +70,8 @@ class UrlGenerator:
         return HostInfo().os
 
     def _get_package_name(self, key: str):
-        package_name = self.config['package_name'][self._os_family][key]
-        return package_name.replace("[version]", self._version_for_url).replace("[arch]", self.arch)
+        package_name = self.config['package_name'][self._os_family][self.arch][key]
+        return package_name.replace("[version]", self._version_for_url)
 
     @staticmethod
     def _get_config(path: str):
