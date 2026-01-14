@@ -33,7 +33,7 @@ class UrlGenerator:
         :return: Architecture name ('arm64' or 'amd64')
         """
         if self.__arch is None:
-            if HostInfo().arch == 'aarch64':
+            if HostInfo().arch in ['aarch64', 'arm64']:
                 self.__arch = 'arm64'
             else:
                 self.__arch = 'amd64'
