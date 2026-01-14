@@ -11,8 +11,8 @@
   },
   "package_name": {
     "debian": {
-      "package_cef107": "onlyoffice-desktopeditors_[version]~cef107_amd64.deb",
-      "package": "onlyoffice-desktopeditors_[version]_amd64.deb"
+      "package_cef107": "onlyoffice-desktopeditors_[version]~cef107_[arch].deb",
+      "package": "onlyoffice-desktopeditors_[version]_[arch].deb"
     },
     "rhel": {
       "package_cef107": "onlyoffice-desktopeditors-[version]~cef107.el7.x86_64.rpm",

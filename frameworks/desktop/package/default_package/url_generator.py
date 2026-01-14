@@ -15,7 +15,17 @@ class UrlGenerator:
         self.host_name = HostInfo().name().lower()
         self.host_version = HostInfo().version
         self.config = self._get_config(data.custom_config)
+        self.__arch = None
         print(f"[green]|INFO| Host Information: {self.host_name} {HostInfo().version}")
+
+    @property
+    def arch(self) -> str:
+        if self.__arch is None:
+            if HostInfo().arch == 'aarch64':
+                self.__arch = 'arm64'
+            else:
+                self.__arch = HostInfo().arch
+        return self.__arch
 
     @property
     def url(self):
@@ -60,7 +70,8 @@ class UrlGenerator:
         return HostInfo().os
 
     def _get_package_name(self, key: str):
-        return self.config['package_name'][self._os_family][key].replace("[version]", self._version_for_url)
+        package_name = self.config['package_name'][self._os_family][key]
+        return package_name.replace("[version]", self._version_for_url).replace("[arch]", self.arch)
 
     @staticmethod
     def _get_config(path: str):
