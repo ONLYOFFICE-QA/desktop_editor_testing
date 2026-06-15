@@ -1,9 +1,14 @@
 # -*- coding: utf-8 -*-
+import platform
+
 import cv2
 import numpy as np
+from numpy.fft import fft2, ifft2
 from PIL import ImageGrab
 
 from .image import Image
+
+_IS_ARM = platform.machine() in ('aarch64', 'arm64')
 
 
 class ImageNewSystem(Image):
@@ -13,6 +18,79 @@ class ImageNewSystem(Image):
         return cv2.imread(img_path)
 
     @staticmethod
+    def _match_template(image: np.ndarray, template: np.ndarray) -> "tuple[float, tuple]":
+        """Platform-safe template matching. Uses numpy FFT on ARM64 (cv2.matchTemplate causes SIGILL on VBox).
+        :param image: grayscale image
+        :param template: grayscale template
+        """
+        if _IS_ARM:
+            return ImageNewSystem._match_template_fft(image, template)
+        result = cv2.matchTemplate(image, template, cv2.TM_CCOEFF_NORMED)
+        _, max_val, _, max_loc = cv2.minMaxLoc(result)
+        return max_val, max_loc
+
+    @staticmethod
+    def _match_template_fft(image: np.ndarray, template: np.ndarray) -> "tuple[float, tuple]":
+        """Fully vectorized FFT-based normalized cross-correlation using numpy.
+        :param image: grayscale image (H, W)
+        :param template: grayscale template (h, w)
+        """
+        ih, iw = image.shape[:2]
+        th, tw = template.shape[:2]
+
+        if th > ih or tw > iw:
+            return 0.0, (0, 0)
+
+        image_f = image.astype(np.float64)
+        template_f = template.astype(np.float64)
+
+        tmpl_mean = template_f.mean()
+        tmpl_centered = template_f - tmpl_mean
+        tmpl_energy = np.sum(tmpl_centered ** 2)
+
+        if tmpl_energy == 0:
+            return 0.0, (0, 0)
+
+        padded_tmpl = np.zeros((ih, iw), dtype=np.float64)
+        padded_tmpl[:th, :tw] = tmpl_centered
+        cross_corr = np.real(ifft2(fft2(image_f) * np.conj(fft2(padded_tmpl))))
+
+        n = th * tw
+        valid_h = ih - th + 1
+        valid_w = iw - tw + 1
+
+        integral = np.cumsum(np.cumsum(image_f, axis=0), axis=1)
+        integral_sq = np.cumsum(np.cumsum(image_f ** 2, axis=0), axis=1)
+
+        br = integral[th - 1:th - 1 + valid_h, tw - 1:tw - 1 + valid_w]
+        br_sq = integral_sq[th - 1:th - 1 + valid_h, tw - 1:tw - 1 + valid_w]
+
+        patch_sum = br.copy()
+        patch_sq_sum = br_sq.copy()
+
+        if valid_h > 1:
+            patch_sum[1:, :] -= integral[:valid_h - 1, tw - 1:tw - 1 + valid_w]
+            patch_sq_sum[1:, :] -= integral_sq[:valid_h - 1, tw - 1:tw - 1 + valid_w]
+        if valid_w > 1:
+            patch_sum[:, 1:] -= integral[th - 1:th - 1 + valid_h, :valid_w - 1]
+            patch_sq_sum[:, 1:] -= integral_sq[th - 1:th - 1 + valid_h, :valid_w - 1]
+        if valid_h > 1 and valid_w > 1:
+            patch_sum[1:, 1:] += integral[:valid_h - 1, :valid_w - 1]
+            patch_sq_sum[1:, 1:] += integral_sq[:valid_h - 1, :valid_w - 1]
+
+        patch_var = patch_sq_sum - (patch_sum ** 2) / n
+        cc = cross_corr[:valid_h, :valid_w] - tmpl_mean * patch_sum
+
+        with np.errstate(divide='ignore', invalid='ignore'):
+            ncc = cc / np.sqrt(np.maximum(patch_var, 0) * tmpl_energy)
+            ncc = np.where(np.isfinite(ncc), ncc, 0.0)
+
+        max_idx = int(np.argmax(ncc))
+        max_y, max_x = divmod(max_idx, valid_w)
+
+        return max(0.0, float(ncc[max_y, max_x])), (max_x, max_y)
+
+    @staticmethod
     def find_template_on_window(
             window_coord: tuple,
             template: str,
@@ -20,7 +98,7 @@ class ImageNewSystem(Image):
     ) -> "list[int, int] | None":
         window = cv2.cvtColor(ImageNewSystem.grab_coordinate(window_coord), cv2.COLOR_BGR2GRAY)
         template = cv2.cvtColor(cv2.imread(template), cv2.COLOR_BGR2GRAY)
-        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(cv2.matchTemplate(window, template, cv2.TM_CCOEFF_NORMED))
+        max_val, max_loc = ImageNewSystem._match_template(window, template)
         if max_val >= threshold:
             h, w = template.shape
             center_x = max_loc[0] + w // 2 + window_coord[0]
@@ -37,8 +115,8 @@ class ImageNewSystem(Image):
         img = ImageNewSystem.grab_coordinate(window_coordinates)
         window = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         template = cv2.cvtColor(cv2.imread(template) if isinstance(template, str) else template, cv2.COLOR_BGR2GRAY)
-        _, max_val, _, _ = cv2.minMaxLoc(cv2.matchTemplate(window, template, cv2.TM_CCOEFF_NORMED))
-        return True if max_val >= threshold else False
+        max_val, _ = ImageNewSystem._match_template(window, template)
+        return max_val >= threshold
 
     @staticmethod
     def grab_coordinate(window_coordinates: tuple = None) -> np.array:

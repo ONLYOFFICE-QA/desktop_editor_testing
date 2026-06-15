@@ -8,7 +8,7 @@ class TestException(Exception):
         self.message = message
 
     def __str__(self):
-        print(f"[bold red]{self.__class__.__name__}[/bold red] {self.message}")
+        print(f"[bold red]{self.__class__.__name__}[/bold red] [red]{self.message}[/red]")
         return ''
 
 class DesktopException(TestException): ...

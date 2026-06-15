@@ -50,7 +50,7 @@ class DesktopEditor:
 
         return Popen(command, stdout=PIPE, stderr=PIPE, shell=True)
 
-    def close(self) -> None:
+    def close(self, check_interval: float = 0.5) -> None:
         print(f"[green]|INFO| Try close desktop")
         for proc in psutil.process_iter(attrs=['pid', 'name']):
             if proc.info['name'] in self.process_name:
@@ -61,6 +61,7 @@ class DesktopEditor:
                 else:
                     print(f"[green]|INFO| Sending SIGTERM to {proc.info['name']} (PID: {pid}) on Linux/macOS")
                     os.kill(pid, signal.SIGTERM)
+                time.sleep(check_interval)
 
 
     def wait_until_close(self, timeout: int = 20, check_interval: float = 0.5) -> bool:
