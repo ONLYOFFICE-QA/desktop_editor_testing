@@ -36,7 +36,6 @@ class DesktopEditor:
             log_out_mode: bool = False,
             stdout: bool = True
     ) -> Popen:
-        self.close()
         commands_parts = [
             self._generate_running_command(),
             self.log_out_cmd if log_out_mode else '',
