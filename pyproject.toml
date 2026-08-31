@@ -14,7 +14,7 @@ psutil = "*"
 requests = "*"
 distro = "*"
 pyvirtualdisplay = "*"
-opencv-python = "*"
+opencv-python = "4.11.0.86"
 urllib3 = '*'
 pillow = '*'
 pywin32 = { version = "*", markers = "sys_platform == 'win32'" }
