@@ -102,7 +102,12 @@ def upgrade_pip():
     pip_install("--upgrade", "pip")
 
 def install_requirements():
-    pip_install("-r", REQUIREMENTS_FILE)
+    """Install the generated requirements.
+    --prefer-binary: on an old glibc (CentOS 7 has 2.17) new releases may come without a wheel for it
+    (Pillow 12.3.0 dropped manylinux2014), and their sdist needs dev headers the VM lacks;
+    pip takes the newest release that has a wheel instead.
+    """
+    pip_install("--prefer-binary", "-r", REQUIREMENTS_FILE)
 
 if __name__ == "__main__":
     ensure_ssl()
